@@ -2,7 +2,7 @@ import React, { useState, Suspense, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Canvas } from '@react-three/fiber';
 import { Environment, Stars } from '@react-three/drei';
-import { Search, MapPin, Volume2, VolumeX, Image as ImageIcon, Camera, Play, Pause } from 'lucide-react';
+import { Search, MapPin, Volume2, VolumeX, Image as ImageIcon, Camera, Play, Pause, Heart } from 'lucide-react';
 
 export default function SearchPage() {
   const navigate = useNavigate();
@@ -15,6 +15,7 @@ export default function SearchPage() {
   const [isVideoPlaying, setIsVideoPlaying] = useState(true);
 
   const [activeCategory, setActiveCategory] = useState('All');
+  const [savedPlaces, setSavedPlaces] = useState([]);
 
   const TRENDING_PLACES = [
     // --- MONUMENTS ---
@@ -78,7 +79,9 @@ export default function SearchPage() {
     { name: 'Voyager 1 Probe', location: 'Interstellar Space', category: 'Space', vrReady: false, gradient: 'linear-gradient(160deg, #878581, #4d4b47)' }
   ];
 
-  const filteredPlaces = activeCategory === 'All' ? TRENDING_PLACES : TRENDING_PLACES.filter(p => p.category === activeCategory);
+  const filteredPlaces = activeCategory === 'Saved' 
+    ? TRENDING_PLACES.filter(p => savedPlaces.includes(p.name))
+    : activeCategory === 'All' ? TRENDING_PLACES : TRENDING_PLACES.filter(p => p.category === activeCategory);
 
   const isSpeakingRef = useRef(false);
   const textContainerRef = useRef(null);
@@ -321,6 +324,7 @@ export default function SearchPage() {
                 <h3 style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: '1.1rem', color: 'rgba(255,255,255,0.4)', marginBottom: '16px', paddingLeft: '16px', textTransform: 'uppercase', letterSpacing: '1px' }}>Explore</h3>
                 
                 <div onClick={() => setActiveCategory('All')} style={{ fontSize: '15px', padding: '12px 16px', borderRadius: '12px', background: activeCategory === 'All' ? 'rgba(214,51,132,0.15)' : 'transparent', color: activeCategory === 'All' ? 'var(--violet)' : 'rgba(255,255,255,0.6)', cursor: 'pointer', transition: 'all 0.2s', fontWeight: activeCategory === 'All' ? 600 : 500 }}>All Destinations</div>
+                <div onClick={() => setActiveCategory('Saved')} style={{ fontSize: '15px', padding: '12px 16px', borderRadius: '12px', background: activeCategory === 'Saved' ? 'rgba(214,51,132,0.15)' : 'transparent', color: activeCategory === 'Saved' ? 'var(--violet)' : 'rgba(255,255,255,0.6)', cursor: 'pointer', transition: 'all 0.2s', fontWeight: activeCategory === 'Saved' ? 600 : 500, display: 'flex', alignItems: 'center', justifyItems: 'space-between' }}>Saved Places <Heart size={14} fill={activeCategory === 'Saved' ? 'var(--violet)' : 'transparent'} color={activeCategory === 'Saved' ? 'var(--violet)' : 'rgba(255,255,255,0.4)'} style={{ marginLeft: 'auto' }} /></div>
                 
                 <div onClick={() => setActiveCategory('Monuments')} style={{ fontSize: '15px', padding: '12px 16px', borderRadius: '12px', background: activeCategory === 'Monuments' ? 'rgba(214,51,132,0.15)' : 'transparent', color: activeCategory === 'Monuments' ? 'var(--violet)' : 'rgba(255,255,255,0.6)', cursor: 'pointer', transition: 'all 0.2s', fontWeight: activeCategory === 'Monuments' ? 600 : 500 }}>Monuments</div>
                 
@@ -559,24 +563,50 @@ export default function SearchPage() {
                     <div style={{ height: '4px', width: '60px', background: 'linear-gradient(135deg, var(--violet), var(--cyan))', borderRadius: '2px', marginTop: '10px' }} />
                   </div>
                   
-                  <button 
-                    onClick={toggleSpeech}
-                    style={{
-                      background: isSpeakingRef.current ? 'var(--violet)' : 'rgba(255, 255, 255, 0.1)',
-                      border: 'none',
-                      borderRadius: '50%',
-                      width: '56px',
-                      height: '56px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      cursor: 'pointer',
-                      transition: 'all 0.3s ease',
-                      boxShadow: isSpeakingRef.current ? '0 0 20px rgba(139, 124, 246, 0.6)' : 'none'
-                    }}
-                  >
-                    {isSpeakingRef.current ? <Volume2 size={24} color="white" /> : <VolumeX size={24} color="white" />}
-                  </button>
+                  <div style={{ display: 'flex', gap: '15px' }}>
+                    <button 
+                      onClick={() => {
+                        if (savedPlaces.includes(locationData.name)) {
+                          setSavedPlaces(savedPlaces.filter(n => n !== locationData.name));
+                        } else {
+                          setSavedPlaces([...savedPlaces, locationData.name]);
+                        }
+                      }}
+                      style={{
+                        background: 'rgba(255, 255, 255, 0.1)',
+                        border: 'none',
+                        borderRadius: '50%',
+                        width: '56px',
+                        height: '56px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease',
+                      }}
+                    >
+                      <Heart size={24} color={savedPlaces.includes(locationData.name) ? 'var(--violet)' : 'var(--text)'} fill={savedPlaces.includes(locationData.name) ? 'var(--violet)' : 'none'} />
+                    </button>
+
+                    <button 
+                      onClick={toggleSpeech}
+                      style={{
+                        background: isSpeakingRef.current ? 'var(--violet)' : 'rgba(255, 255, 255, 0.1)',
+                        border: 'none',
+                        borderRadius: '50%',
+                        width: '56px',
+                        height: '56px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease',
+                        boxShadow: isSpeakingRef.current ? '0 0 20px rgba(139, 124, 246, 0.6)' : 'none'
+                      }}
+                    >
+                      {isSpeakingRef.current ? <Volume2 size={24} color="white" /> : <VolumeX size={24} color="white" />}
+                    </button>
+                  </div>
                 </div>
 
                 {/* CTA Row from Mockup */}
