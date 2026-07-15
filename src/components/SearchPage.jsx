@@ -321,15 +321,10 @@ export default function SearchPage() {
                   </h1>
                 </div>
 
-                <h3 style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: '1.1rem', color: 'rgba(255,255,255,0.4)', marginBottom: '16px', paddingLeft: '16px', textTransform: 'uppercase', letterSpacing: '1px' }}>Explore</h3>
-                
-                <div onClick={() => setActiveCategory('All')} style={{ fontSize: '15px', padding: '12px 16px', borderRadius: '12px', background: activeCategory === 'All' ? 'rgba(214,51,132,0.15)' : 'transparent', color: activeCategory === 'All' ? 'var(--violet)' : 'rgba(255,255,255,0.6)', cursor: 'pointer', transition: 'all 0.2s', fontWeight: activeCategory === 'All' ? 600 : 500 }}>All Destinations</div>
-                <div onClick={() => setActiveCategory('Saved')} style={{ fontSize: '15px', padding: '12px 16px', borderRadius: '12px', background: activeCategory === 'Saved' ? 'rgba(214,51,132,0.15)' : 'transparent', color: activeCategory === 'Saved' ? 'var(--violet)' : 'rgba(255,255,255,0.6)', cursor: 'pointer', transition: 'all 0.2s', fontWeight: activeCategory === 'Saved' ? 600 : 500, display: 'flex', alignItems: 'center', justifyItems: 'space-between' }}>Saved Places <Heart size={14} fill={activeCategory === 'Saved' ? 'var(--violet)' : 'transparent'} color={activeCategory === 'Saved' ? 'var(--violet)' : 'rgba(255,255,255,0.4)'} style={{ marginLeft: 'auto' }} /></div>
-                
                 <h3 style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: '1.1rem', color: 'rgba(255,255,255,0.4)', marginTop: '24px', marginBottom: '16px', paddingLeft: '16px', textTransform: 'uppercase', letterSpacing: '1px' }}>Categories</h3>
                 
                 <select 
-                  value={['All', 'Saved'].includes(activeCategory) ? '' : activeCategory}
+                  value={activeCategory}
                   onChange={(e) => setActiveCategory(e.target.value)}
                   style={{
                     width: 'calc(100% - 16px)',
@@ -345,12 +340,13 @@ export default function SearchPage() {
                     fontFamily: "'Inter', sans-serif"
                   }}
                 >
-                  <option value="" disabled>Select Category</option>
-                  <option value="Monuments">Monuments</option>
-                  <option value="Temples">Temples</option>
-                  <option value="Nature">Nature</option>
-                  <option value="Heritage">Heritage</option>
-                  <option value="Space">Space</option>
+                  <option value="All" style={{ color: 'black' }}>All Destinations</option>
+                  <option value="Saved" style={{ color: 'black' }}>Saved Places</option>
+                  <option value="Monuments" style={{ color: 'black' }}>Monuments</option>
+                  <option value="Temples" style={{ color: 'black' }}>Temples</option>
+                  <option value="Nature" style={{ color: 'black' }}>Nature</option>
+                  <option value="Heritage" style={{ color: 'black' }}>Heritage</option>
+                  <option value="Space" style={{ color: 'black' }}>Space</option>
                 </select>
              </div>
 
@@ -424,11 +420,7 @@ export default function SearchPage() {
                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
                          <h4 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text)', margin: 0 }}>{place.name}</h4>
                        </div>
-                       <p style={{ fontSize: '13px', color: 'var(--text-dim)', margin: '0 0 12px 0' }}>{place.location}</p>
-                       <div style={{ display: 'flex', gap: '8px' }}>
-                         <div style={{ fontSize: '12px', padding: '6px 12px', borderRadius: '10px', background: 'rgba(255,255,255,0.05)', color: '#cfcdf0', border: '1px solid var(--line)' }}>▶ Video</div>
-                         <div style={{ fontSize: '12px', padding: '6px 12px', borderRadius: '10px', background: 'linear-gradient(135deg, var(--cyan), #2fb8b0)', color: 'white' }}>Enter VR</div>
-                       </div>
+                       <p style={{ fontSize: '13px', color: 'var(--text-dim)', margin: '0' }}>{place.location}</p>
                      </div>
                    </div>
                  ))}
