@@ -20,10 +20,10 @@ export default function SearchPage() {
   const TRENDING_PLACES = [
     // --- MONUMENTS ---
     { name: 'Taj Mahal', location: 'Agra, India', category: 'Monuments', vrReady: true, gradient: 'linear-gradient(160deg, #e8b979, #b3652f)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Taj_Mahal_%28Edited%29.jpeg/330px-Taj_Mahal_%28Edited%29.jpeg' },
-    { name: 'Eiffel Tower', location: 'Paris, France', category: 'Monuments', vrReady: false, gradient: 'linear-gradient(160deg, #7ba3c9, #33587e)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Tour_Eiffel_Wikimedia_Commons_%28cropped%29.jpg/330px-Tour_Eiffel_Wikimedia_Commons_%28cropped%29.jpg' },
+    { name: 'Eiffel Tower', location: 'Paris, France', category: 'Monuments', vrReady: false, gradient: 'linear-gradient(160deg, #7ba3c9, #33587e)', image: 'https://upload.wikimedia.org/wikipedia/en/thumb/b/ba/Eiffel_Tower_logo.svg/330px-Eiffel_Tower_logo.svg.png' },
     { name: 'Colosseum', location: 'Rome, Italy', category: 'Monuments', vrReady: true, gradient: 'linear-gradient(160deg, #c98b6b, #7a4a34)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Colosseo_2020.jpg/330px-Colosseo_2020.jpg' },
     { name: 'Statue of Liberty', location: 'New York, USA', category: 'Monuments', vrReady: false, gradient: 'linear-gradient(160deg, #8ba89a, #4a6b5d)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Front_view_of_Statue_of_Liberty_%28cropped%29.jpg/330px-Front_view_of_Statue_of_Liberty_%28cropped%29.jpg' },
-    { name: 'Christ the Redeemer', location: 'Rio de Janeiro, Brazil', category: 'Monuments', vrReady: true, gradient: 'linear-gradient(160deg, #9ca674, #5a6639)', image: 'https://picsum.photos/seed/Christ%20the%20Redeemer/200/200' },
+    { name: 'Christ the Redeemer', location: 'Rio de Janeiro, Brazil', category: 'Monuments', vrReady: true, gradient: 'linear-gradient(160deg, #9ca674, #5a6639)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Christ_the_Redeemer_-_Cristo_Redentor.jpg/330px-Christ_the_Redeemer_-_Cristo_Redentor.jpg' },
     { name: 'Burj Khalifa', location: 'Dubai, UAE', category: 'Monuments', vrReady: true, gradient: 'linear-gradient(160deg, #8493a8, #2a3b54)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Burj_Khalifa_%28worlds_tallest_building%29_and_the_Dubai_skyline_%2825781049892%29.jpg/330px-Burj_Khalifa_%28worlds_tallest_building%29_and_the_Dubai_skyline_%2825781049892%29.jpg' },
     { name: 'Sydney Opera House', location: 'Sydney, Australia', category: 'Monuments', vrReady: true, gradient: 'linear-gradient(160deg, #c4a77d, #8a6a3b)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Sydney_Australia._%2821339175489%29.jpg/330px-Sydney_Australia._%2821339175489%29.jpg' },
     { name: 'Mount Rushmore', location: 'South Dakota, USA', category: 'Monuments', vrReady: false, gradient: 'linear-gradient(160deg, #d49579, #8c4a30)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Mount_Rushmore_detail_view_%28100MP%29.jpg/330px-Mount_Rushmore_detail_view_%28100MP%29.jpg' },
@@ -31,52 +31,52 @@ export default function SearchPage() {
     { name: 'Lincoln Memorial', location: 'Washington D.C., USA', category: 'Monuments', vrReady: true, gradient: 'linear-gradient(160deg, #c3d3df, #788a99)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/Lincoln_Memorial_east_side.JPG/330px-Lincoln_Memorial_east_side.JPG' },
 
     // --- TEMPLES ---
-    { name: 'Meenakshi Temple', location: 'Madurai, India', category: 'Temples', vrReady: true, gradient: 'linear-gradient(160deg, #d9885b, #94401a)', image: 'https://picsum.photos/seed/Meenakshi%20Temple/200/200' },
-    { name: 'Kashi Vishwanath', location: 'Varanasi, India', category: 'Temples', vrReady: true, gradient: 'linear-gradient(160deg, #e8ba54, #9c731e)', image: 'https://picsum.photos/seed/Kashi%20Vishwanath/200/200' },
-    { name: 'Borobudur', location: 'Magelang, Indonesia', category: 'Temples', vrReady: false, gradient: 'linear-gradient(160deg, #878581, #4d4b47)', image: 'https://picsum.photos/seed/Borobudur/200/200' },
-    { name: 'Senso-ji', location: 'Tokyo, Japan', category: 'Temples', vrReady: true, gradient: 'linear-gradient(160deg, #c74c4c, #852222)', image: 'https://picsum.photos/seed/Senso-ji/200/200' },
-    { name: 'Angkor Wat', location: 'Siem Reap, Cambodia', category: 'Temples', vrReady: false, gradient: 'linear-gradient(160deg, #c4a77d, #8a6a3b)', image: 'https://picsum.photos/seed/Angkor%20Wat/200/200' },
-    { name: 'Golden Temple', location: 'Amritsar, India', category: 'Temples', vrReady: true, gradient: 'linear-gradient(160deg, #e8b979, #b3652f)', image: 'https://picsum.photos/seed/Golden%20Temple/200/200' },
-    { name: 'Prambanan', location: 'Yogyakarta, Indonesia', category: 'Temples', vrReady: true, gradient: 'linear-gradient(160deg, #8ba89a, #4a6b5d)', image: 'https://picsum.photos/seed/Prambanan/200/200' },
-    { name: 'Tirupati Balaji', location: 'Andhra Pradesh, India', category: 'Temples', vrReady: true, gradient: 'linear-gradient(160deg, #c98b6b, #7a4a34)', image: 'https://picsum.photos/seed/Tirupati%20Balaji/200/200' },
-    { name: 'Kinkaku-ji', location: 'Kyoto, Japan', category: 'Temples', vrReady: true, gradient: 'linear-gradient(160deg, #9ca674, #5a6639)', image: 'https://picsum.photos/seed/Kinkaku-ji/200/200' },
-    { name: 'Karnak Temple', location: 'Luxor, Egypt', category: 'Temples', vrReady: true, gradient: 'linear-gradient(160deg, #d37554, #8b3c22)', image: 'https://picsum.photos/seed/Karnak%20Temple/200/200' },
+    { name: 'Meenakshi Temple', location: 'Madurai, India', category: 'Temples', vrReady: true, gradient: 'linear-gradient(160deg, #d9885b, #94401a)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/An_aerial_view_of_Madurai_city_from_atop_of_Meenakshi_Amman_temple.jpg/330px-An_aerial_view_of_Madurai_city_from_atop_of_Meenakshi_Amman_temple.jpg' },
+    { name: 'Kashi Vishwanath', location: 'Varanasi, India', category: 'Temples', vrReady: true, gradient: 'linear-gradient(160deg, #e8ba54, #9c731e)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Kashi_Vishwanath.jpg/330px-Kashi_Vishwanath.jpg' },
+    { name: 'Borobudur', location: 'Magelang, Indonesia', category: 'Temples', vrReady: false, gradient: 'linear-gradient(160deg, #878581, #4d4b47)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Pradaksina.jpg/330px-Pradaksina.jpg' },
+    { name: 'Senso-ji', location: 'Tokyo, Japan', category: 'Temples', vrReady: true, gradient: 'linear-gradient(160deg, #c74c4c, #852222)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Sensoji_2023.jpg/330px-Sensoji_2023.jpg' },
+    { name: 'Angkor Wat', location: 'Siem Reap, Cambodia', category: 'Temples', vrReady: false, gradient: 'linear-gradient(160deg, #c4a77d, #8a6a3b)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Angkor_Wat.jpg/330px-Angkor_Wat.jpg' },
+    { name: 'Golden Temple', location: 'Amritsar, India', category: 'Temples', vrReady: true, gradient: 'linear-gradient(160deg, #e8b979, #b3652f)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/The_Golden_Temple_of_Amrithsar_7.jpg/330px-The_Golden_Temple_of_Amrithsar_7.jpg' },
+    { name: 'Prambanan', location: 'Yogyakarta, Indonesia', category: 'Temples', vrReady: true, gradient: 'linear-gradient(160deg, #8ba89a, #4a6b5d)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Prambanan_Temple_Yogyakarta_Indonesia.jpg/330px-Prambanan_Temple_Yogyakarta_Indonesia.jpg' },
+    { name: 'Tirupati Balaji', location: 'Andhra Pradesh, India', category: 'Temples', vrReady: true, gradient: 'linear-gradient(160deg, #c98b6b, #7a4a34)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Tirumala_090615.jpg/330px-Tirumala_090615.jpg' },
+    { name: 'Kinkaku-ji', location: 'Kyoto, Japan', category: 'Temples', vrReady: true, gradient: 'linear-gradient(160deg, #9ca674, #5a6639)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Golden_Pavilion_Kinkaku-ji_water_mirror_2024.jpg/330px-Golden_Pavilion_Kinkaku-ji_water_mirror_2024.jpg' },
+    { name: 'Karnak Temple', location: 'Luxor, Egypt', category: 'Temples', vrReady: true, gradient: 'linear-gradient(160deg, #d37554, #8b3c22)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Temple_de_Louxor_68.jpg/330px-Temple_de_Louxor_68.jpg' },
 
     // --- NATURE ---
-    { name: 'Grand Canyon', location: 'Arizona, USA', category: 'Nature', vrReady: true, gradient: 'linear-gradient(160deg, #d37554, #8b3c22)', image: 'https://picsum.photos/seed/Grand%20Canyon/200/200' },
-    { name: 'Mount Everest', location: 'Himalayas, Nepal', category: 'Nature', vrReady: true, gradient: 'linear-gradient(160deg, #c3d3df, #788a99)', image: 'https://picsum.photos/seed/Mount%20Everest/200/200' },
-    { name: 'Great Barrier Reef', location: 'Queensland, Australia', category: 'Nature', vrReady: true, gradient: 'linear-gradient(160deg, #6bc4c9, #2b7a8a)', image: 'https://picsum.photos/seed/Great%20Barrier%20Reef/200/200' },
-    { name: 'Victoria Falls', location: 'Zambia / Zimbabwe', category: 'Nature', vrReady: true, gradient: 'linear-gradient(160deg, #7ba3c9, #33587e)', image: 'https://picsum.photos/seed/Victoria%20Falls/200/200' },
-    { name: 'Amazon Rainforest', location: 'South America', category: 'Nature', vrReady: false, gradient: 'linear-gradient(160deg, #8ba89a, #4a6b5d)', image: 'https://picsum.photos/seed/Amazon%20Rainforest/200/200' },
-    { name: 'Aurora Borealis', location: 'Iceland', category: 'Nature', vrReady: true, gradient: 'linear-gradient(160deg, #8493a8, #2a3b54)', image: 'https://picsum.photos/seed/Aurora%20Borealis/200/200' },
-    { name: 'Mount Fuji', location: 'Honshu, Japan', category: 'Nature', vrReady: true, gradient: 'linear-gradient(160deg, #c74c4c, #852222)', image: 'https://picsum.photos/seed/Mount%20Fuji/200/200' },
-    { name: 'Yellowstone', location: 'Wyoming, USA', category: 'Nature', vrReady: true, gradient: 'linear-gradient(160deg, #e8ba54, #9c731e)', image: 'https://picsum.photos/seed/Yellowstone/200/200' },
-    { name: 'Sahara Desert', location: 'North Africa', category: 'Nature', vrReady: false, gradient: 'linear-gradient(160deg, #d49579, #8c4a30)', image: 'https://picsum.photos/seed/Sahara%20Desert/200/200' },
-    { name: 'Galapagos Islands', location: 'Ecuador', category: 'Nature', vrReady: true, gradient: 'linear-gradient(160deg, #6bc4c9, #2b7a8a)', image: 'https://picsum.photos/seed/Galapagos%20Islands/200/200' },
+    { name: 'Grand Canyon', location: 'Arizona, USA', category: 'Nature', vrReady: true, gradient: 'linear-gradient(160deg, #d37554, #8b3c22)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Canyon_River_Tree_%28165872763%29.jpeg/330px-Canyon_River_Tree_%28165872763%29.jpeg' },
+    { name: 'Mount Everest', location: 'Himalayas, Nepal', category: 'Nature', vrReady: true, gradient: 'linear-gradient(160deg, #c3d3df, #788a99)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Mt._Everest_from_Gokyo_Ri_November_5%2C_2012.jpg/330px-Mt._Everest_from_Gokyo_Ri_November_5%2C_2012.jpg' },
+    { name: 'Great Barrier Reef', location: 'Queensland, Australia', category: 'Nature', vrReady: true, gradient: 'linear-gradient(160deg, #6bc4c9, #2b7a8a)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/ISS-45_StoryOfWater%2C_Great_Barrier_Reef%2C_Australia.jpg/330px-ISS-45_StoryOfWater%2C_Great_Barrier_Reef%2C_Australia.jpg' },
+    { name: 'Victoria Falls', location: 'Zambia / Zimbabwe', category: 'Nature', vrReady: true, gradient: 'linear-gradient(160deg, #7ba3c9, #33587e)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Cataratas_Victoria%2C_Zambia-Zimbabue%2C_2018-07-27%2C_DD_04.jpg/330px-Cataratas_Victoria%2C_Zambia-Zimbabue%2C_2018-07-27%2C_DD_04.jpg' },
+    { name: 'Amazon Rainforest', location: 'South America', category: 'Nature', vrReady: false, gradient: 'linear-gradient(160deg, #8ba89a, #4a6b5d)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Amazon17_%285641020319%29.jpg/330px-Amazon17_%285641020319%29.jpg' },
+    { name: 'Aurora Borealis', location: 'Iceland', category: 'Nature', vrReady: true, gradient: 'linear-gradient(160deg, #8493a8, #2a3b54)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Aurora_borealis_over_Eielson_Air_Force_Base%2C_Alaska.jpg/330px-Aurora_borealis_over_Eielson_Air_Force_Base%2C_Alaska.jpg' },
+    { name: 'Mount Fuji', location: 'Honshu, Japan', category: 'Nature', vrReady: true, gradient: 'linear-gradient(160deg, #c74c4c, #852222)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/View_of_Mount_Fuji_from_%C5%8Cwakudani_20211202.jpg/330px-View_of_Mount_Fuji_from_%C5%8Cwakudani_20211202.jpg' },
+    { name: 'Yellowstone', location: 'Wyoming, USA', category: 'Nature', vrReady: true, gradient: 'linear-gradient(160deg, #e8ba54, #9c731e)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Grand_Canyon_of_yellowstone.jpg/330px-Grand_Canyon_of_yellowstone.jpg' },
+    { name: 'Sahara Desert', location: 'North Africa', category: 'Nature', vrReady: false, gradient: 'linear-gradient(160deg, #d49579, #8c4a30)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Sahara_real_color.jpg/330px-Sahara_real_color.jpg' },
+    { name: 'Galapagos Islands', location: 'Ecuador', category: 'Nature', vrReady: true, gradient: 'linear-gradient(160deg, #6bc4c9, #2b7a8a)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Lobo_marino_%28Zalophus_californianus_wollebaeki%29%2C_Punta_Pitt%2C_isla_de_San_Crist%C3%B3bal%2C_islas_Gal%C3%A1pagos%2C_Ecuador%2C_2015-07-24%2C_DD_11.JPG/330px-Lobo_marino_%28Zalophus_californianus_wollebaeki%29%2C_Punta_Pitt%2C_isla_de_San_Crist%C3%B3bal%2C_islas_Gal%C3%A1pagos%2C_Ecuador%2C_2015-07-24%2C_DD_11.JPG' },
 
     // --- HERITAGE ---
-    { name: 'Machu Picchu', location: 'Cusco, Peru', category: 'Heritage', vrReady: true, gradient: 'linear-gradient(160deg, #9ca674, #5a6639)', image: 'https://picsum.photos/seed/Machu%20Picchu/200/200' },
+    { name: 'Machu Picchu', location: 'Cusco, Peru', category: 'Heritage', vrReady: true, gradient: 'linear-gradient(160deg, #9ca674, #5a6639)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Machu_Picchu%2C_2023_%28012%29.jpg/330px-Machu_Picchu%2C_2023_%28012%29.jpg' },
     { name: 'Petra', location: 'Ma\'an, Jordan', category: 'Heritage', vrReady: true, gradient: 'linear-gradient(160deg, #d49579, #8c4a30)' },
-    { name: 'Pyramids of Giza', location: 'Giza, Egypt', category: 'Heritage', vrReady: true, gradient: 'linear-gradient(160deg, #e8ba54, #9c731e)', image: 'https://picsum.photos/seed/Pyramids%20of%20Giza/200/200' },
-    { name: 'Stonehenge', location: 'Wiltshire, England', category: 'Heritage', vrReady: false, gradient: 'linear-gradient(160deg, #878581, #4d4b47)', image: 'https://picsum.photos/seed/Stonehenge/200/200' },
-    { name: 'Great Wall of China', location: 'Huairou, China', category: 'Heritage', vrReady: true, gradient: 'linear-gradient(160deg, #c98b6b, #7a4a34)', image: 'https://picsum.photos/seed/Great%20Wall%20of%20China/200/200' },
-    { name: 'Acropolis of Athens', location: 'Athens, Greece', category: 'Heritage', vrReady: true, gradient: 'linear-gradient(160deg, #c3d3df, #788a99)', image: 'https://picsum.photos/seed/Acropolis%20of%20Athens/200/200' },
-    { name: 'Chichen Itza', location: 'Yucatan, Mexico', category: 'Heritage', vrReady: true, gradient: 'linear-gradient(160deg, #d9885b, #94401a)', image: 'https://picsum.photos/seed/Chichen%20Itza/200/200' },
-    { name: 'Alhambra', location: 'Granada, Spain', category: 'Heritage', vrReady: false, gradient: 'linear-gradient(160deg, #c4a77d, #8a6a3b)', image: 'https://picsum.photos/seed/Alhambra/200/200' },
-    { name: 'Taj Mahal', location: 'Agra, India', category: 'Heritage', vrReady: true, gradient: 'linear-gradient(160deg, #e8b979, #b3652f)', image: 'https://picsum.photos/seed/Taj%20Mahal/200/200' },
-    { name: 'Pompeii', location: 'Campania, Italy', category: 'Heritage', vrReady: true, gradient: 'linear-gradient(160deg, #7ba3c9, #33587e)', image: 'https://picsum.photos/seed/Pompeii/200/200' },
+    { name: 'Pyramids of Giza', location: 'Giza, Egypt', category: 'Heritage', vrReady: true, gradient: 'linear-gradient(160deg, #e8ba54, #9c731e)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Pyramids_of_the_Giza_Necropolis.jpg/330px-Pyramids_of_the_Giza_Necropolis.jpg' },
+    { name: 'Stonehenge', location: 'Wiltshire, England', category: 'Heritage', vrReady: false, gradient: 'linear-gradient(160deg, #878581, #4d4b47)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Stonehenge2007_07_30.jpg/330px-Stonehenge2007_07_30.jpg' },
+    { name: 'Great Wall of China', location: 'Huairou, China', category: 'Heritage', vrReady: true, gradient: 'linear-gradient(160deg, #c98b6b, #7a4a34)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/The_Great_Wall_of_China_at_Jinshanling-edit.jpg/330px-The_Great_Wall_of_China_at_Jinshanling-edit.jpg' },
+    { name: 'Acropolis of Athens', location: 'Athens, Greece', category: 'Heritage', vrReady: true, gradient: 'linear-gradient(160deg, #c3d3df, #788a99)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/1029_Acropolis_of_Athens_in_Greece_at_night_Photo_by_Giles_Laurent.jpg/330px-1029_Acropolis_of_Athens_in_Greece_at_night_Photo_by_Giles_Laurent.jpg' },
+    { name: 'Chichen Itza', location: 'Yucatan, Mexico', category: 'Heritage', vrReady: true, gradient: 'linear-gradient(160deg, #d9885b, #94401a)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Chichen_Itza_3.jpg/330px-Chichen_Itza_3.jpg' },
+    { name: 'Alhambra', location: 'Granada, Spain', category: 'Heritage', vrReady: false, gradient: 'linear-gradient(160deg, #c4a77d, #8a6a3b)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Dawn_Charles_V_Palace_Alhambra_Granada_Andalusia_Spain.jpg/330px-Dawn_Charles_V_Palace_Alhambra_Granada_Andalusia_Spain.jpg' },
+    { name: 'Taj Mahal', location: 'Agra, India', category: 'Heritage', vrReady: true, gradient: 'linear-gradient(160deg, #e8b979, #b3652f)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Taj_Mahal_%28Edited%29.jpeg/330px-Taj_Mahal_%28Edited%29.jpeg' },
+    { name: 'Pompeii', location: 'Campania, Italy', category: 'Heritage', vrReady: true, gradient: 'linear-gradient(160deg, #7ba3c9, #33587e)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Aerial_image_of_Pompeii_and_Mount_Vesuvius_%28view_from_the_southeast%29.jpg/330px-Aerial_image_of_Pompeii_and_Mount_Vesuvius_%28view_from_the_southeast%29.jpg' },
 
     // --- SPACE ---
-    { name: 'ISS (Space Station)', location: 'Low Earth Orbit', category: 'Space', vrReady: true, gradient: 'linear-gradient(160deg, #8493a8, #2a3b54)', image: 'https://picsum.photos/seed/ISS%20(Space%20Station)/200/200' },
-    { name: 'Mars Surface', location: 'Gale Crater, Mars', category: 'Space', vrReady: true, gradient: 'linear-gradient(160deg, #c2694f, #752914)', image: 'https://picsum.photos/seed/Mars%20Surface/200/200' },
-    { name: 'Moon Landing Site', location: 'Sea of Tranquility', category: 'Space', vrReady: true, gradient: 'linear-gradient(160deg, #c3d3df, #788a99)', image: 'https://picsum.photos/seed/Moon%20Landing%20Site/200/200' },
-    { name: 'Jupiter Great Red Spot', location: 'Jupiter Atmosphere', category: 'Space', vrReady: false, gradient: 'linear-gradient(160deg, #d37554, #8b3c22)', image: 'https://picsum.photos/seed/Jupiter%20Great%20Red%20Spot/200/200' },
-    { name: 'Saturn Rings', location: 'Saturn Orbit', category: 'Space', vrReady: true, gradient: 'linear-gradient(160deg, #e8ba54, #9c731e)', image: 'https://picsum.photos/seed/Saturn%20Rings/200/200' },
-    { name: 'Pluto Surface', location: 'Kuiper Belt', category: 'Space', vrReady: false, gradient: 'linear-gradient(160deg, #7ba3c9, #33587e)', image: 'https://picsum.photos/seed/Pluto%20Surface/200/200' },
-    { name: 'Andromeda Galaxy', location: 'Local Group', category: 'Space', vrReady: true, gradient: 'linear-gradient(160deg, #9ca674, #5a6639)', image: 'https://picsum.photos/seed/Andromeda%20Galaxy/200/200' },
-    { name: 'Orion Nebula', location: 'Milky Way', category: 'Space', vrReady: true, gradient: 'linear-gradient(160deg, #c74c4c, #852222)', image: 'https://picsum.photos/seed/Orion%20Nebula/200/200' },
-    { name: 'Pillars of Creation', location: 'Eagle Nebula', category: 'Space', vrReady: true, gradient: 'linear-gradient(160deg, #d49579, #8c4a30)', image: 'https://picsum.photos/seed/Pillars%20of%20Creation/200/200' },
-    { name: 'Voyager 1 Probe', location: 'Interstellar Space', category: 'Space', vrReady: false, gradient: 'linear-gradient(160deg, #878581, #4d4b47)', image: 'https://picsum.photos/seed/Voyager%201%20Probe/200/200' }
+    { name: 'ISS (Space Station)', location: 'Low Earth Orbit', category: 'Space', vrReady: true, gradient: 'linear-gradient(160deg, #8493a8, #2a3b54)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/International_Space_Station_after_undocking_of_STS-132.jpg/330px-International_Space_Station_after_undocking_of_STS-132.jpg' },
+    { name: 'Mars Surface', location: 'Gale Crater, Mars', category: 'Space', vrReady: true, gradient: 'linear-gradient(160deg, #c2694f, #752914)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Mars_Curiosity_Rover_-_Gale_Crater.jpg/330px-Mars_Curiosity_Rover_-_Gale_Crater.jpg' },
+    { name: 'Moon Landing Site', location: 'Sea of Tranquility', category: 'Space', vrReady: true, gradient: 'linear-gradient(160deg, #c3d3df, #788a99)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Apollo_11_AS11-40-5874.jpg/330px-Apollo_11_AS11-40-5874.jpg' },
+    { name: 'Jupiter Great Red Spot', location: 'Jupiter Atmosphere', category: 'Space', vrReady: false, gradient: 'linear-gradient(160deg, #d37554, #8b3c22)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Jupiter.jpg/330px-Jupiter.jpg' },
+    { name: 'Saturn Rings', location: 'Saturn Orbit', category: 'Space', vrReady: true, gradient: 'linear-gradient(160deg, #e8ba54, #9c731e)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/PIA17172_Saturn_eclipse_mosaic_bright_crop.jpg/330px-PIA17172_Saturn_eclipse_mosaic_bright_crop.jpg' },
+    { name: 'Pluto Surface', location: 'Kuiper Belt', category: 'Space', vrReady: false, gradient: 'linear-gradient(160deg, #7ba3c9, #33587e)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Pluto_in_True_Color_-_High-Res.jpg/330px-Pluto_in_True_Color_-_High-Res.jpg' },
+    { name: 'Andromeda Galaxy', location: 'Local Group', category: 'Space', vrReady: true, gradient: 'linear-gradient(160deg, #9ca674, #5a6639)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Andromeda_Galaxy_2025.png/330px-Andromeda_Galaxy_2025.png' },
+    { name: 'Orion Nebula', location: 'Milky Way', category: 'Space', vrReady: true, gradient: 'linear-gradient(160deg, #c74c4c, #852222)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Orion_Nebula_-_Hubble_2006_mosaic_18000.jpg/330px-Orion_Nebula_-_Hubble_2006_mosaic_18000.jpg' },
+    { name: 'Pillars of Creation', location: 'Eagle Nebula', category: 'Space', vrReady: true, gradient: 'linear-gradient(160deg, #d49579, #8c4a30)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Eagle_nebula_pillars.jpg/330px-Eagle_nebula_pillars.jpg' },
+    { name: 'Voyager 1 Probe', location: 'Interstellar Space', category: 'Space', vrReady: false, gradient: 'linear-gradient(160deg, #878581, #4d4b47)', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Voyager.jpg/330px-Voyager.jpg' }
   ];
 
   const filteredPlaces = activeCategory === 'Saved' 
@@ -328,15 +328,30 @@ export default function SearchPage() {
                 
                 <h3 style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: '1.1rem', color: 'rgba(255,255,255,0.4)', marginTop: '24px', marginBottom: '16px', paddingLeft: '16px', textTransform: 'uppercase', letterSpacing: '1px' }}>Categories</h3>
                 
-                <div onClick={() => setActiveCategory('Monuments')} style={{ fontSize: '15px', padding: '12px 16px', borderRadius: '12px', background: activeCategory === 'Monuments' ? 'rgba(214,51,132,0.15)' : 'transparent', color: activeCategory === 'Monuments' ? 'var(--violet)' : 'rgba(255,255,255,0.6)', cursor: 'pointer', transition: 'all 0.2s', fontWeight: activeCategory === 'Monuments' ? 600 : 500 }}>Monuments</div>
-                
-                <div onClick={() => setActiveCategory('Temples')} style={{ fontSize: '15px', padding: '12px 16px', borderRadius: '12px', background: activeCategory === 'Temples' ? 'rgba(214,51,132,0.15)' : 'transparent', color: activeCategory === 'Temples' ? 'var(--violet)' : 'rgba(255,255,255,0.6)', cursor: 'pointer', transition: 'all 0.2s', fontWeight: activeCategory === 'Temples' ? 600 : 500 }}>Temples</div>
-                
-                <div onClick={() => setActiveCategory('Nature')} style={{ fontSize: '15px', padding: '12px 16px', borderRadius: '12px', background: activeCategory === 'Nature' ? 'rgba(214,51,132,0.15)' : 'transparent', color: activeCategory === 'Nature' ? 'var(--violet)' : 'rgba(255,255,255,0.6)', cursor: 'pointer', transition: 'all 0.2s', fontWeight: activeCategory === 'Nature' ? 600 : 500 }}>Nature</div>
-                
-                <div onClick={() => setActiveCategory('Heritage')} style={{ fontSize: '15px', padding: '12px 16px', borderRadius: '12px', background: activeCategory === 'Heritage' ? 'rgba(214,51,132,0.15)' : 'transparent', color: activeCategory === 'Heritage' ? 'var(--violet)' : 'rgba(255,255,255,0.6)', cursor: 'pointer', transition: 'all 0.2s', fontWeight: activeCategory === 'Heritage' ? 600 : 500 }}>Heritage</div>
-                
-                <div onClick={() => setActiveCategory('Space')} style={{ fontSize: '15px', padding: '12px 16px', borderRadius: '12px', background: activeCategory === 'Space' ? 'rgba(214,51,132,0.15)' : 'transparent', color: activeCategory === 'Space' ? 'var(--violet)' : 'rgba(255,255,255,0.6)', cursor: 'pointer', transition: 'all 0.2s', fontWeight: activeCategory === 'Space' ? 600 : 500 }}>Space</div>
+                <select 
+                  value={['All', 'Saved'].includes(activeCategory) ? '' : activeCategory}
+                  onChange={(e) => setActiveCategory(e.target.value)}
+                  style={{
+                    width: 'calc(100% - 16px)',
+                    marginLeft: '8px',
+                    padding: '12px 16px',
+                    borderRadius: '12px',
+                    background: 'var(--surface)',
+                    border: '1px solid var(--line)',
+                    color: 'white',
+                    fontSize: '15px',
+                    outline: 'none',
+                    cursor: 'pointer',
+                    fontFamily: "'Inter', sans-serif"
+                  }}
+                >
+                  <option value="" disabled>Select Category</option>
+                  <option value="Monuments">Monuments</option>
+                  <option value="Temples">Temples</option>
+                  <option value="Nature">Nature</option>
+                  <option value="Heritage">Heritage</option>
+                  <option value="Space">Space</option>
+                </select>
              </div>
 
              {/* Main Content Area (Right Side) */}
