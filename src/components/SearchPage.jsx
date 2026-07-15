@@ -1,0 +1,675 @@
+import React, { useState, Suspense, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Canvas } from '@react-three/fiber';
+import { Environment, Stars } from '@react-three/drei';
+import { Search, MapPin, Volume2, VolumeX, Image as ImageIcon, Camera, Play, Pause } from 'lucide-react';
+
+export default function SearchPage() {
+  const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [locationData, setLocationData] = useState(null);
+  const [isSearching, setIsSearching] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [videoFailed, setVideoFailed] = useState(false);
+  const [activeMedia, setActiveMedia] = useState('video'); // 'image', 'video', 'vr'
+  const [isVideoPlaying, setIsVideoPlaying] = useState(true);
+
+  const [activeCategory, setActiveCategory] = useState('All');
+
+  const TRENDING_PLACES = [
+    // --- MONUMENTS ---
+    { name: 'Taj Mahal', location: 'Agra, India', category: 'Monuments', vrReady: true, gradient: 'linear-gradient(160deg, #e8b979, #b3652f)' },
+    { name: 'Eiffel Tower', location: 'Paris, France', category: 'Monuments', vrReady: false, gradient: 'linear-gradient(160deg, #7ba3c9, #33587e)' },
+    { name: 'Colosseum', location: 'Rome, Italy', category: 'Monuments', vrReady: true, gradient: 'linear-gradient(160deg, #c98b6b, #7a4a34)' },
+    { name: 'Statue of Liberty', location: 'New York, USA', category: 'Monuments', vrReady: false, gradient: 'linear-gradient(160deg, #8ba89a, #4a6b5d)' },
+    { name: 'Christ the Redeemer', location: 'Rio de Janeiro, Brazil', category: 'Monuments', vrReady: true, gradient: 'linear-gradient(160deg, #9ca674, #5a6639)' },
+    { name: 'Burj Khalifa', location: 'Dubai, UAE', category: 'Monuments', vrReady: true, gradient: 'linear-gradient(160deg, #8493a8, #2a3b54)' },
+    { name: 'Sydney Opera House', location: 'Sydney, Australia', category: 'Monuments', vrReady: true, gradient: 'linear-gradient(160deg, #c4a77d, #8a6a3b)' },
+    { name: 'Mount Rushmore', location: 'South Dakota, USA', category: 'Monuments', vrReady: false, gradient: 'linear-gradient(160deg, #d49579, #8c4a30)' },
+    { name: 'Gateway of India', location: 'Mumbai, India', category: 'Monuments', vrReady: true, gradient: 'linear-gradient(160deg, #e8ba54, #9c731e)' },
+    { name: 'Lincoln Memorial', location: 'Washington D.C., USA', category: 'Monuments', vrReady: true, gradient: 'linear-gradient(160deg, #c3d3df, #788a99)' },
+
+    // --- TEMPLES ---
+    { name: 'Meenakshi Temple', location: 'Madurai, India', category: 'Temples', vrReady: true, gradient: 'linear-gradient(160deg, #d9885b, #94401a)' },
+    { name: 'Kashi Vishwanath', location: 'Varanasi, India', category: 'Temples', vrReady: true, gradient: 'linear-gradient(160deg, #e8ba54, #9c731e)' },
+    { name: 'Borobudur', location: 'Magelang, Indonesia', category: 'Temples', vrReady: false, gradient: 'linear-gradient(160deg, #878581, #4d4b47)' },
+    { name: 'Senso-ji', location: 'Tokyo, Japan', category: 'Temples', vrReady: true, gradient: 'linear-gradient(160deg, #c74c4c, #852222)' },
+    { name: 'Angkor Wat', location: 'Siem Reap, Cambodia', category: 'Temples', vrReady: false, gradient: 'linear-gradient(160deg, #c4a77d, #8a6a3b)' },
+    { name: 'Golden Temple', location: 'Amritsar, India', category: 'Temples', vrReady: true, gradient: 'linear-gradient(160deg, #e8b979, #b3652f)' },
+    { name: 'Prambanan', location: 'Yogyakarta, Indonesia', category: 'Temples', vrReady: true, gradient: 'linear-gradient(160deg, #8ba89a, #4a6b5d)' },
+    { name: 'Tirupati Balaji', location: 'Andhra Pradesh, India', category: 'Temples', vrReady: true, gradient: 'linear-gradient(160deg, #c98b6b, #7a4a34)' },
+    { name: 'Kinkaku-ji', location: 'Kyoto, Japan', category: 'Temples', vrReady: true, gradient: 'linear-gradient(160deg, #9ca674, #5a6639)' },
+    { name: 'Karnak Temple', location: 'Luxor, Egypt', category: 'Temples', vrReady: true, gradient: 'linear-gradient(160deg, #d37554, #8b3c22)' },
+
+    // --- NATURE ---
+    { name: 'Grand Canyon', location: 'Arizona, USA', category: 'Nature', vrReady: true, gradient: 'linear-gradient(160deg, #d37554, #8b3c22)' },
+    { name: 'Mount Everest', location: 'Himalayas, Nepal', category: 'Nature', vrReady: true, gradient: 'linear-gradient(160deg, #c3d3df, #788a99)' },
+    { name: 'Great Barrier Reef', location: 'Queensland, Australia', category: 'Nature', vrReady: true, gradient: 'linear-gradient(160deg, #6bc4c9, #2b7a8a)' },
+    { name: 'Victoria Falls', location: 'Zambia / Zimbabwe', category: 'Nature', vrReady: true, gradient: 'linear-gradient(160deg, #7ba3c9, #33587e)' },
+    { name: 'Amazon Rainforest', location: 'South America', category: 'Nature', vrReady: false, gradient: 'linear-gradient(160deg, #8ba89a, #4a6b5d)' },
+    { name: 'Aurora Borealis', location: 'Iceland', category: 'Nature', vrReady: true, gradient: 'linear-gradient(160deg, #8493a8, #2a3b54)' },
+    { name: 'Mount Fuji', location: 'Honshu, Japan', category: 'Nature', vrReady: true, gradient: 'linear-gradient(160deg, #c74c4c, #852222)' },
+    { name: 'Yellowstone', location: 'Wyoming, USA', category: 'Nature', vrReady: true, gradient: 'linear-gradient(160deg, #e8ba54, #9c731e)' },
+    { name: 'Sahara Desert', location: 'North Africa', category: 'Nature', vrReady: false, gradient: 'linear-gradient(160deg, #d49579, #8c4a30)' },
+    { name: 'Galapagos Islands', location: 'Ecuador', category: 'Nature', vrReady: true, gradient: 'linear-gradient(160deg, #6bc4c9, #2b7a8a)' },
+
+    // --- HERITAGE ---
+    { name: 'Machu Picchu', location: 'Cusco, Peru', category: 'Heritage', vrReady: true, gradient: 'linear-gradient(160deg, #9ca674, #5a6639)' },
+    { name: 'Petra', location: 'Ma\'an, Jordan', category: 'Heritage', vrReady: true, gradient: 'linear-gradient(160deg, #d49579, #8c4a30)' },
+    { name: 'Pyramids of Giza', location: 'Giza, Egypt', category: 'Heritage', vrReady: true, gradient: 'linear-gradient(160deg, #e8ba54, #9c731e)' },
+    { name: 'Stonehenge', location: 'Wiltshire, England', category: 'Heritage', vrReady: false, gradient: 'linear-gradient(160deg, #878581, #4d4b47)' },
+    { name: 'Great Wall of China', location: 'Huairou, China', category: 'Heritage', vrReady: true, gradient: 'linear-gradient(160deg, #c98b6b, #7a4a34)' },
+    { name: 'Acropolis of Athens', location: 'Athens, Greece', category: 'Heritage', vrReady: true, gradient: 'linear-gradient(160deg, #c3d3df, #788a99)' },
+    { name: 'Chichen Itza', location: 'Yucatan, Mexico', category: 'Heritage', vrReady: true, gradient: 'linear-gradient(160deg, #d9885b, #94401a)' },
+    { name: 'Alhambra', location: 'Granada, Spain', category: 'Heritage', vrReady: false, gradient: 'linear-gradient(160deg, #c4a77d, #8a6a3b)' },
+    { name: 'Taj Mahal', location: 'Agra, India', category: 'Heritage', vrReady: true, gradient: 'linear-gradient(160deg, #e8b979, #b3652f)' },
+    { name: 'Pompeii', location: 'Campania, Italy', category: 'Heritage', vrReady: true, gradient: 'linear-gradient(160deg, #7ba3c9, #33587e)' },
+
+    // --- SPACE ---
+    { name: 'ISS (Space Station)', location: 'Low Earth Orbit', category: 'Space', vrReady: true, gradient: 'linear-gradient(160deg, #8493a8, #2a3b54)' },
+    { name: 'Mars Surface', location: 'Gale Crater, Mars', category: 'Space', vrReady: true, gradient: 'linear-gradient(160deg, #c2694f, #752914)' },
+    { name: 'Moon Landing Site', location: 'Sea of Tranquility', category: 'Space', vrReady: true, gradient: 'linear-gradient(160deg, #c3d3df, #788a99)' },
+    { name: 'Jupiter Great Red Spot', location: 'Jupiter Atmosphere', category: 'Space', vrReady: false, gradient: 'linear-gradient(160deg, #d37554, #8b3c22)' },
+    { name: 'Saturn Rings', location: 'Saturn Orbit', category: 'Space', vrReady: true, gradient: 'linear-gradient(160deg, #e8ba54, #9c731e)' },
+    { name: 'Pluto Surface', location: 'Kuiper Belt', category: 'Space', vrReady: false, gradient: 'linear-gradient(160deg, #7ba3c9, #33587e)' },
+    { name: 'Andromeda Galaxy', location: 'Local Group', category: 'Space', vrReady: true, gradient: 'linear-gradient(160deg, #9ca674, #5a6639)' },
+    { name: 'Orion Nebula', location: 'Milky Way', category: 'Space', vrReady: true, gradient: 'linear-gradient(160deg, #c74c4c, #852222)' },
+    { name: 'Pillars of Creation', location: 'Eagle Nebula', category: 'Space', vrReady: true, gradient: 'linear-gradient(160deg, #d49579, #8c4a30)' },
+    { name: 'Voyager 1 Probe', location: 'Interstellar Space', category: 'Space', vrReady: false, gradient: 'linear-gradient(160deg, #878581, #4d4b47)' }
+  ];
+
+  const filteredPlaces = activeCategory === 'All' ? TRENDING_PLACES : TRENDING_PLACES.filter(p => p.category === activeCategory);
+
+  const isSpeakingRef = useRef(false);
+  const textContainerRef = useRef(null);
+  const videoIframeRef = useRef(null);
+
+  const toggleVideoPlay = (e) => {
+    e.stopPropagation();
+    if (videoIframeRef.current && videoIframeRef.current.contentWindow) {
+      const action = isVideoPlaying ? 'pauseVideo' : 'playVideo';
+      videoIframeRef.current.contentWindow.postMessage(`{"event":"command","func":"${action}","args":""}`, '*');
+      setIsVideoPlaying(!isVideoPlaying);
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      window.speechSynthesis.cancel();
+      isSpeakingRef.current = false;
+    };
+  }, []);
+
+  const speakSummary = (text) => {
+    if (!text) return;
+    
+    // Stop any current audio
+    window.speechSynthesis.cancel();
+    
+    // Some browsers need a tiny delay after cancel
+    setTimeout(() => {
+      const utterance = new SpeechSynthesisUtterance(text);
+      
+      // Load voices to avoid Chrome silent failure
+      const availableVoices = window.speechSynthesis.getVoices();
+      
+      // Explicitly set an English voice, preferably Google US or UK
+      const englishVoice = availableVoices.find(v => v.lang.includes('en-') && v.name.includes('Google')) 
+                        || availableVoices.find(v => v.lang.includes('en-')) 
+                        || availableVoices[0];
+      
+      if (englishVoice) {
+        utterance.voice = englishVoice;
+      }
+      
+      // Slightly slow down speech for better AI narration feel
+      utterance.rate = 0.95;
+      utterance.pitch = 1;
+      
+      utterance.onstart = () => {
+        setIsSpeaking(true);
+        isSpeakingRef.current = true;
+      };
+
+      utterance.onend = () => {
+        setIsSpeaking(false);
+        isSpeakingRef.current = false;
+      };
+
+      utterance.onerror = (e) => {
+        console.error("Speech error:", e);
+        setIsSpeaking(false);
+        isSpeakingRef.current = false;
+      };
+
+      window.speechSynthesis.speak(utterance);
+    }, 50);
+  };
+
+  const toggleSpeech = () => {
+    if (isSpeaking) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+      isSpeakingRef.current = false;
+    } else if (locationData) {
+      speakSummary(locationData.summary);
+    }
+  };
+
+  const handleSearch = async (e, directQuery = null) => {
+    if (e) e.preventDefault();
+    const queryToUse = directQuery || searchQuery;
+    if (!queryToUse.trim()) return;
+
+    setIsSearching(true);
+    let normalizedSearch = queryToUse.trim().toLowerCase();
+    
+    try {
+      let title = normalizedSearch;
+      let summary = `${normalizedSearch} is a beautiful destination.`;
+      let imageUrl = null;
+
+      try {
+        const searchRes = await fetch(`https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(normalizedSearch)}&utf8=&format=json&origin=*`);
+        const searchData = await searchRes.json();
+        
+        if (searchData.query && searchData.query.search && searchData.query.search.length > 0) {
+          const correctTitle = searchData.query.search[0].title;
+          const response = await fetch(`https://en.wikipedia.org/w/api.php?action=query&prop=extracts|pageimages&exsentences=5&explaintext=true&piprop=original&titles=${encodeURIComponent(correctTitle)}&format=json&origin=*`);
+          
+          if (response.ok) {
+            const dataWrapper = await response.json();
+            const pages = dataWrapper.query.pages;
+            const data = Object.values(pages)[0];
+            if (data && !data.missing) {
+              title = data.title;
+              summary = data.extract ? data.extract.replace(/==.*?==/g, '').trim() : summary;
+              imageUrl = data.original?.source || null;
+            }
+          }
+        }
+      } catch (wikiErr) {
+        console.error("Wikipedia API fetch failed:", wikiErr);
+      }
+
+      let youtubeId = null;
+      try {
+        const ytResponse = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(normalizedSearch + " cinematic drone 4k landscape high quality")}&type=video&videoDefinition=high&maxResults=1&key=AIzaSyAql1uryXvB8TTeBg63O-2JoXes20KE-T8`);
+        if (ytResponse.ok) {
+          const ytData = await ytResponse.json();
+          if (ytData.items && ytData.items.length > 0) {
+            youtubeId = ytData.items[0].id.videoId;
+          }
+        }
+      } catch (ytError) {
+        console.error("YouTube API fetch failed:", ytError);
+      }
+
+      // Dynamically fetch VR 360 video from YouTube API!
+      let vrYoutubeId = null;
+      try {
+        const vrResponse = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(normalizedSearch + " 360 vr video")}&type=video&videoDefinition=high&maxResults=1&key=AIzaSyAql1uryXvB8TTeBg63O-2JoXes20KE-T8`);
+        if (vrResponse.ok) {
+          const vrData = await vrResponse.json();
+          if (vrData.items && vrData.items.length > 0) {
+            vrYoutubeId = vrData.items[0].id.videoId;
+          }
+        }
+      } catch (vrError) {
+        console.error("YouTube VR API fetch failed:", vrError);
+      }
+
+      const newData = {
+        name: title,
+        summary: summary,
+        imageUrl: imageUrl,
+        videoUrl: null,
+        youtubeId: youtubeId,
+        vrYoutubeId: vrYoutubeId
+      };
+      setLocationData(newData);
+      setVideoFailed(false);
+      setActiveMedia(youtubeId ? 'video' : 'image');
+      setTimeout(() => speakSummary(newData.summary), 500);
+      
+    } catch (error) {
+      console.error("Search failed:", error);
+      alert("Search failed. Please try again.");
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  return (
+    <div style={{ 
+      height: '100vh', display: 'flex', width: '100vw', position: 'relative', overflow: 'hidden', fontFamily: "'Inter', sans-serif",
+      '--bg': '#18181b',
+      '--surface': '#ffffff',
+      '--surface-2': '#fdf8fa',
+      '--line': 'rgba(0,0,0,0.1)',
+      '--line-strong': 'rgba(0,0,0,0.2)',
+      '--violet': '#d63384',
+      '--violet-dim': 'rgba(214, 51, 132, 0.1)',
+      '--cyan': '#20c997',
+      '--cyan-dim': 'rgba(32, 201, 151, 0.14)',
+      '--text': '#222222',
+      '--text-dim': '#555555',
+      '--text-faint': '#888888'
+    }}>
+      
+      {/* Background from Mockup */}
+      <div style={{
+        position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 0,
+        background: 'var(--bg)'
+      }}>
+        <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
+          <ambientLight intensity={0.5} />
+          <directionalLight position={[10, 10, 5]} intensity={1} />
+          
+          <Suspense fallback={null}>
+            <Environment preset="city" />
+            <Environment preset="city" />
+          </Suspense>
+        </Canvas>
+      </div>
+
+      {/* Minimal Back Button Overlay */}
+      {locationData && (
+        <div style={{ position: 'absolute', top: '30px', left: '30px', zIndex: 150 }}>
+          <div 
+            onClick={() => { setLocationData(null); setSearchQuery(''); }}
+            style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '8px', 
+              cursor: 'pointer', 
+              background: 'rgba(0,0,0,0.6)', 
+              padding: '12px 24px', 
+              borderRadius: '40px', 
+              backdropFilter: 'blur(10px)',
+              boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
+              transition: 'transform 0.2s',
+              ':hover': { transform: 'scale(1.05)' }
+            }}
+          >
+            <span style={{ color: 'white', fontWeight: '600', fontSize: '15px' }}>← Dashboard</span>
+          </div>
+        </div>
+      )}
+
+      {/* Main Interface Content */}
+      <div style={{ position: 'relative', zIndex: 10, width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', overflow: 'hidden' }}>
+        
+        {/* Dynamic Empty State vs Results State */}
+        {!locationData ? (
+          <div style={{ flex: 1, display: 'flex', width: '100%', maxWidth: '100%', margin: 0, padding: 0, overflow: 'hidden' }}>
+             
+             {/* Categories Sidebar (Left Side) */}
+             <div style={{ width: '220px', flexShrink: 0, padding: '40px 15px 0 25px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                
+                {/* Dashboard Logo */}
+                <div 
+                  onClick={() => { setLocationData(null); setSearchQuery(''); }}
+                  style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', marginBottom: '40px', paddingLeft: '8px' }}
+                >
+                  <div style={{ width: '28px', height: '28px', borderRadius: '6px', background: 'linear-gradient(135deg, var(--violet), var(--cyan))' }}></div>
+                  <h1 style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: '1.4rem', margin: 0, fontWeight: 700, color: 'white' }}>
+                    VR Explorer
+                  </h1>
+                </div>
+
+                <h3 style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: '1.1rem', color: 'rgba(255,255,255,0.4)', marginBottom: '16px', paddingLeft: '16px', textTransform: 'uppercase', letterSpacing: '1px' }}>Explore</h3>
+                
+                <div onClick={() => setActiveCategory('All')} style={{ fontSize: '15px', padding: '12px 16px', borderRadius: '12px', background: activeCategory === 'All' ? 'rgba(214,51,132,0.15)' : 'transparent', color: activeCategory === 'All' ? 'var(--violet)' : 'rgba(255,255,255,0.6)', cursor: 'pointer', transition: 'all 0.2s', fontWeight: activeCategory === 'All' ? 600 : 500 }}>All Destinations</div>
+                
+                <div onClick={() => setActiveCategory('Monuments')} style={{ fontSize: '15px', padding: '12px 16px', borderRadius: '12px', background: activeCategory === 'Monuments' ? 'rgba(214,51,132,0.15)' : 'transparent', color: activeCategory === 'Monuments' ? 'var(--violet)' : 'rgba(255,255,255,0.6)', cursor: 'pointer', transition: 'all 0.2s', fontWeight: activeCategory === 'Monuments' ? 600 : 500 }}>Monuments</div>
+                
+                <div onClick={() => setActiveCategory('Temples')} style={{ fontSize: '15px', padding: '12px 16px', borderRadius: '12px', background: activeCategory === 'Temples' ? 'rgba(214,51,132,0.15)' : 'transparent', color: activeCategory === 'Temples' ? 'var(--violet)' : 'rgba(255,255,255,0.6)', cursor: 'pointer', transition: 'all 0.2s', fontWeight: activeCategory === 'Temples' ? 600 : 500 }}>Temples</div>
+                
+                <div onClick={() => setActiveCategory('Nature')} style={{ fontSize: '15px', padding: '12px 16px', borderRadius: '12px', background: activeCategory === 'Nature' ? 'rgba(214,51,132,0.15)' : 'transparent', color: activeCategory === 'Nature' ? 'var(--violet)' : 'rgba(255,255,255,0.6)', cursor: 'pointer', transition: 'all 0.2s', fontWeight: activeCategory === 'Nature' ? 600 : 500 }}>Nature</div>
+                
+                <div onClick={() => setActiveCategory('Heritage')} style={{ fontSize: '15px', padding: '12px 16px', borderRadius: '12px', background: activeCategory === 'Heritage' ? 'rgba(214,51,132,0.15)' : 'transparent', color: activeCategory === 'Heritage' ? 'var(--violet)' : 'rgba(255,255,255,0.6)', cursor: 'pointer', transition: 'all 0.2s', fontWeight: activeCategory === 'Heritage' ? 600 : 500 }}>Heritage</div>
+                
+                <div onClick={() => setActiveCategory('Space')} style={{ fontSize: '15px', padding: '12px 16px', borderRadius: '12px', background: activeCategory === 'Space' ? 'rgba(214,51,132,0.15)' : 'transparent', color: activeCategory === 'Space' ? 'var(--violet)' : 'rgba(255,255,255,0.6)', cursor: 'pointer', transition: 'all 0.2s', fontWeight: activeCategory === 'Space' ? 600 : 500 }}>Space</div>
+             </div>
+
+             {/* Main Content Area (Right Side) */}
+             <div style={{ flex: 1, background: '#fffcf5', margin: 0, padding: '20px 60px', paddingBottom: '100px', overflowY: 'auto' }}>
+                
+                {/* Search Bar in Content Area */}
+                <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-end', marginBottom: '15px' }}>
+                  <form onSubmit={handleSearch} style={{
+                    width: '600px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: '8px 20px',
+                    borderRadius: '40px',
+                    background: 'white',
+                    border: '1px solid var(--line)',
+                    boxShadow: '0 5px 20px rgba(0,0,0,0.03)',
+                    transition: 'all 0.3s ease'
+                  }}>
+                    <Search size={20} color="var(--violet)" style={{ marginRight: '10px' }} />
+                    <input 
+                      type="text" 
+                      placeholder="Explore the world (e.g. Taj Mahal)..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      style={{
+                        flex: 1,
+                        background: 'transparent',
+                        border: 'none',
+                        color: 'var(--text)',
+                        fontSize: '1rem',
+                        outline: 'none'
+                      }}
+                    />
+                    <button type="submit" disabled={isSearching} style={{
+                      background: 'var(--violet)',
+                      border: 'none',
+                      borderRadius: '30px',
+                      padding: '8px 24px',
+                      color: 'white',
+                      fontWeight: '600',
+                      cursor: isSearching ? 'not-allowed' : 'pointer'
+                    }}>
+                      {isSearching ? '...' : 'Explore'}
+                    </button>
+                  </form>
+                </div>
+                
+               {/* Main Hero Header */}
+               <div style={{ marginBottom: '30px' }}>
+                 <h2 style={{ fontSize: '3rem', fontWeight: 800, marginBottom: '15px', fontFamily: "'Space Grotesk', sans-serif", color: 'var(--text)' }}>Step Into The World</h2>
+                 <p style={{ fontSize: '1.1rem', color: 'var(--text-dim)', maxWidth: '700px', lineHeight: '1.6' }}>Search for any location on earth to instantly experience cinematic drone footage, immersive 360° VR content, and AI-narrated stories.</p>
+               </div>
+
+               {/* Trending Grid Section */}
+               <div style={{ width: '100%' }}>
+                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '24px' }}>
+                   <h3 style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: '1.5rem', fontWeight: '600', color: 'var(--text)', margin: 0 }}>
+                     {activeCategory === 'All' ? 'Trending now' : `${activeCategory} Destinations`}
+                   </h3>
+                 </div>
+                 
+                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
+                 
+                 {filteredPlaces.map((place, index) => (
+                   <div key={index} onClick={() => { setSearchQuery(place.name); handleSearch(null, place.name); }} style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: '18px', padding: '20px', display: 'flex', gap: '16px', cursor: 'pointer', transition: 'transform 0.2s', ':hover': { transform: 'translateY(-5px)' } }}>
+                     <div style={{ width: '80px', height: '80px', borderRadius: '14px', background: place.gradient, flexShrink: 0 }}></div>
+                     <div style={{ flex: 1 }}>
+                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                         <h4 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text)', margin: 0 }}>{place.name}</h4>
+                       </div>
+                       <p style={{ fontSize: '13px', color: 'var(--text-dim)', margin: '0 0 12px 0' }}>{place.location}</p>
+                       <div style={{ display: 'flex', gap: '8px' }}>
+                         <div style={{ fontSize: '12px', padding: '6px 12px', borderRadius: '10px', background: 'rgba(255,255,255,0.05)', color: '#cfcdf0', border: '1px solid var(--line)' }}>▶ Video</div>
+                         <div style={{ fontSize: '12px', padding: '6px 12px', borderRadius: '10px', background: 'linear-gradient(135deg, var(--violet), #6f5ff0)', color: 'white' }}>Enter VR</div>
+                       </div>
+                     </div>
+                   </div>
+                 ))}
+
+                 </div>
+               </div>
+             </div>
+          </div>
+        ) : (
+          <div style={{ 
+            display: 'flex', 
+            flexDirection: 'row',
+            background: '#fffcf5',
+            width: '100%',
+            height: '100%',
+            overflow: 'hidden',
+            animation: 'fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
+            position: 'absolute',
+            top: 0, left: 0, right: 0, bottom: 0,
+            zIndex: 100
+          }}>
+            
+            {/* Media Section */}
+            <div style={{
+              flex: '0 0 55%',
+              background: '#000',
+              position: 'relative',
+              display: 'flex', 
+              alignItems: 'center',
+              justifyContent: 'center',
+              overflow: 'hidden',
+              boxShadow: '20px 0 50px rgba(0,0,0,0.5)',
+              zIndex: 5
+            }}>
+              {activeMedia === 'vr' ? (
+                locationData.vrYoutubeId ? (
+                  <iframe 
+                    width="100%" 
+                    height="100%" 
+                    src={`https://www.youtube.com/embed/${locationData.vrYoutubeId}?autoplay=1&mute=1&loop=1&playlist=${locationData.vrYoutubeId}&controls=1&modestbranding=1&rel=0`} 
+                    title="YouTube VR video player" 
+                    frameBorder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    style={{ objectFit: 'cover' }}
+                  ></iframe>
+                ) : (
+                  <div style={{ textAlign: 'center', padding: '40px', display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', height: '100%', position: 'relative', justifyContent: 'center' }}>
+                    {locationData.imageUrl && (
+                      <img src={locationData.imageUrl} alt="Fallback" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.2, filter: 'blur(5px)' }} />
+                    )}
+                    <div style={{ position: 'relative', zIndex: 10 }}>
+                      <Camera size={64} color="var(--cyan)" style={{ marginBottom: '20px' }} />
+                      <h3 style={{ color: 'var(--text)', marginBottom: '20px', fontSize: '1.8rem', fontFamily: "'Space Grotesk', sans-serif" }}>VR Video Not Available</h3>
+                      <p style={{ color: 'var(--text-dim)', fontSize: '1.2rem', maxWidth: '300px' }}>We couldn't find a high-quality 360° VR video for this specific location.</p>
+                    </div>
+                  </div>
+                )
+              ) : activeMedia === 'video' && locationData.youtubeId ? (
+                <>
+                  <iframe 
+                    ref={videoIframeRef}
+                    width="100%" 
+                    height="100%" 
+                    src={`https://www.youtube.com/embed/${locationData.youtubeId}?autoplay=1&mute=1&loop=1&playlist=${locationData.youtubeId}&controls=0&modestbranding=1&rel=0&enablejsapi=1`} 
+                    title="YouTube video player" 
+                    frameBorder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    style={{ objectFit: 'cover', transform: 'scale(1.4)', pointerEvents: 'none' }}
+                  ></iframe>
+                  {/* Custom Play/Pause Overlay */}
+                  <div 
+                    onClick={toggleVideoPlay}
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      zIndex: 10,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      background: isVideoPlaying ? 'transparent' : 'rgba(0,0,0,0.3)',
+                      transition: 'background 0.3s ease'
+                    }}
+                  >
+                    <div style={{
+                      background: 'rgba(20, 20, 43, 0.7)',
+                      backdropFilter: 'blur(10px)',
+                      padding: '20px',
+                      borderRadius: '50%',
+                      opacity: isVideoPlaying ? 0 : 1,
+                      transform: isVideoPlaying ? 'scale(0.8)' : 'scale(1)',
+                      transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                      boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
+                      border: '1px solid rgba(255,255,255,0.2)'
+                    }}>
+                      {isVideoPlaying ? <Play size={40} color="white" /> : <Pause size={40} color="white" />}
+                    </div>
+                  </div>
+                </>
+              ) : locationData.videoUrl && !videoFailed ? (
+                <video 
+                  src={locationData.videoUrl} 
+                  autoPlay 
+                  loop 
+                  muted 
+                  playsInline
+                  onError={() => setVideoFailed(true)}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                />
+              ) : locationData.imageUrl ? (
+                <img 
+                  src={locationData.imageUrl} 
+                  alt={locationData.name} 
+                  style={{ 
+                    width: '100%', 
+                    height: '100%', 
+                    objectFit: 'cover'
+                  }} 
+                />
+              ) : (
+                <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', color: 'rgba(255,255,255,0.3)' }}>
+                  <ImageIcon size={48} />
+                  <p>No Visuals Available</p>
+                </div>
+              )}
+              {/* Gradient Overlay for blending */}
+              <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '40%', background: 'linear-gradient(to right, transparent, #fffcf5)', pointerEvents: 'none' }} />
+            </div>
+
+            {/* Content Section */}
+            <div style={{ padding: '40px 50px', flex: '1', display: 'flex', flexDirection: 'column', background: 'transparent' }}>
+                {/* Back button removed as requested */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
+                  <div>
+                    <h2 style={{ 
+                      margin: 0, 
+                      fontSize: '2.5rem', 
+                      fontFamily: "'Space Grotesk', sans-serif",
+                      fontWeight: '700',
+                      color: 'var(--text)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px'
+                    }}>
+                      <MapPin color="var(--violet)" size={32} />
+                      {locationData.name}
+                    </h2>
+                    <div style={{ height: '4px', width: '60px', background: 'linear-gradient(135deg, var(--violet), var(--cyan))', borderRadius: '2px', marginTop: '10px' }} />
+                  </div>
+                  
+                  <button 
+                    onClick={toggleSpeech}
+                    style={{
+                      background: isSpeakingRef.current ? 'var(--violet)' : 'rgba(255, 255, 255, 0.1)',
+                      border: 'none',
+                      borderRadius: '50%',
+                      width: '56px',
+                      height: '56px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease',
+                      boxShadow: isSpeakingRef.current ? '0 0 20px rgba(139, 124, 246, 0.6)' : 'none'
+                    }}
+                  >
+                    {isSpeakingRef.current ? <Volume2 size={24} color="white" /> : <VolumeX size={24} color="white" />}
+                  </button>
+                </div>
+
+                {/* CTA Row from Mockup */}
+                <div style={{ display: 'flex', gap: '10px', marginBottom: '22px' }}>
+                  <div 
+                    onClick={() => setActiveMedia('image')}
+                    style={{ flex: 1, padding: '13px', borderRadius: '14px', textAlign: 'center', fontSize: '13px', fontWeight: '500', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', cursor: 'pointer', background: activeMedia === 'image' ? 'var(--violet-dim)' : 'var(--surface)', border: `1px solid ${activeMedia === 'image' ? 'var(--violet)' : 'var(--line)'}`, color: 'var(--text)', transition: 'all 0.2s' }}
+                  >
+                    🖼️<span>View Image</span><small style={{ fontSize: '10px', opacity: 0.75, fontWeight: 400 }}>High Quality</small>
+                  </div>
+                  <div 
+                    onClick={() => setActiveMedia('video')}
+                    style={{ flex: 1, padding: '13px', borderRadius: '14px', textAlign: 'center', fontSize: '13px', fontWeight: '500', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', cursor: 'pointer', background: activeMedia === 'video' ? 'var(--violet-dim)' : 'var(--surface)', border: `1px solid ${activeMedia === 'video' ? 'var(--violet)' : 'var(--line)'}`, color: 'var(--text)', transition: 'all 0.2s' }}
+                  >
+                    ▶<span>Watch video</span><small style={{ fontSize: '10px', opacity: 0.75, fontWeight: 400 }}>Cinematic</small>
+                  </div>
+                  <div 
+                    onClick={() => setActiveMedia('vr')}
+                    style={{ flex: 1, padding: '13px', borderRadius: '14px', textAlign: 'center', fontSize: '13px', fontWeight: '500', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', cursor: 'pointer', background: 'linear-gradient(135deg, var(--violet), #6f5ff0)', color: '#fff', position: 'relative', overflow: 'hidden' }}
+                  >
+                    <div style={{ position: 'absolute', width: '70px', height: '70px', border: '1px solid rgba(255,255,255,0.35)', borderRadius: '50%', top: '-20px', right: '-20px' }}></div>
+                    <span>Enter VR</span><small style={{ fontSize: '10px', opacity: 0.75, fontWeight: 400 }}>360° immersive</small>
+                  </div>
+                </div>
+
+                {/* Ref added for auto-scrolling */}
+                <div ref={textContainerRef} style={{ flex: 1, overflowY: 'auto', paddingRight: '20px', scrollBehavior: 'smooth' }}>
+                  <p style={{ 
+                    fontSize: '1.25rem', 
+                    lineHeight: '1.8', 
+                    color: 'var(--text-dim)',
+                    margin: 0
+                  }}>
+                    {locationData.summary}
+                  </p>
+                  
+                  {/* Info Grid for Premium Feel */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginTop: '40px' }}>
+                    <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: '14px', padding: '15px' }}>
+                      <span style={{ fontSize: '11px', color: 'var(--text-faint)', display: 'block', marginBottom: '6px' }}>Built / Established</span>
+                      <strong style={{ fontSize: '15px', fontWeight: '500', color: 'var(--text)' }}>
+                        {locationData.name.toLowerCase().includes('taj') ? '1631–1653' : 'Historical Era'}
+                      </strong>
+                    </div>
+                    <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: '14px', padding: '15px' }}>
+                      <span style={{ fontSize: '11px', color: 'var(--text-faint)', display: 'block', marginBottom: '6px' }}>Best time</span>
+                      <strong style={{ fontSize: '15px', fontWeight: '500', color: 'var(--text)' }}>
+                        {locationData.name.toLowerCase().includes('taj') ? 'Oct – Mar' : 'Spring / Fall'}
+                      </strong>
+                    </div>
+                    <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: '14px', padding: '15px' }}>
+                      <span style={{ fontSize: '11px', color: 'var(--text-faint)', display: 'block', marginBottom: '6px' }}>Rating</span>
+                      <strong style={{ fontSize: '15px', fontWeight: '500', color: 'var(--text)' }}>4.8 ★</strong>
+                    </div>
+                    <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: '14px', padding: '15px' }}>
+                      <span style={{ fontSize: '11px', color: 'var(--text-faint)', display: 'block', marginBottom: '6px' }}>Entry fee</span>
+                      <strong style={{ fontSize: '15px', fontWeight: '500', color: 'var(--text)' }}>
+                        {locationData.name.toLowerCase().includes('taj') ? '₹50 / ₹1100' : 'Varies'}
+                      </strong>
+                    </div>
+                  </div>
+                </div>
+              </div>
+          </div>
+        )}
+
+      </div>
+
+      <style dangerouslySetInnerHTML={{__html: `
+        :root {
+          --bg: #0a0a18;
+          --surface: #14142b;
+          --surface-2: #1c1c3a;
+          --line: rgba(255,255,255,0.08);
+          --line-strong: rgba(255,255,255,0.16);
+          --violet: #8b7cf6;
+          --violet-dim: rgba(139,124,246,0.16);
+          --cyan: #4fd8d0;
+          --cyan-dim: rgba(79,216,208,0.14);
+          --text: #f2f1ff;
+          --text-dim: #9694b8;
+          --text-faint: #605d80;
+        }
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(30px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        /* Custom scrollbar for text container */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
+      `}} />
+    </div>
+  );
+}
