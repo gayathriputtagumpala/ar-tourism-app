@@ -323,31 +323,18 @@ export default function SearchPage() {
 
                 <h3 style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: '1.1rem', color: 'rgba(255,255,255,0.4)', marginTop: '24px', marginBottom: '16px', paddingLeft: '16px', textTransform: 'uppercase', letterSpacing: '1px' }}>Categories</h3>
                 
-                <select 
-                  value={activeCategory}
-                  onChange={(e) => setActiveCategory(e.target.value)}
-                  style={{
-                    width: 'calc(100% - 16px)',
-                    marginLeft: '8px',
-                    padding: '12px 16px',
-                    borderRadius: '12px',
-                    background: 'var(--surface)',
-                    border: '1px solid var(--line)',
-                    color: 'white',
-                    fontSize: '15px',
-                    outline: 'none',
-                    cursor: 'pointer',
-                    fontFamily: "'Inter', sans-serif"
-                  }}
-                >
-                  <option value="All" style={{ color: 'black' }}>All Destinations</option>
-                  <option value="Saved" style={{ color: 'black' }}>Saved Places</option>
-                  <option value="Monuments" style={{ color: 'black' }}>Monuments</option>
-                  <option value="Temples" style={{ color: 'black' }}>Temples</option>
-                  <option value="Nature" style={{ color: 'black' }}>Nature</option>
-                  <option value="Heritage" style={{ color: 'black' }}>Heritage</option>
-                  <option value="Space" style={{ color: 'black' }}>Space</option>
-                </select>
+                <div onClick={() => setActiveCategory('All')} style={{ fontSize: '15px', padding: '12px 16px', borderRadius: '12px', background: activeCategory === 'All' ? 'rgba(214,51,132,0.15)' : 'transparent', color: activeCategory === 'All' ? 'var(--violet)' : 'rgba(255,255,255,0.6)', cursor: 'pointer', transition: 'all 0.2s', fontWeight: activeCategory === 'All' ? 600 : 500 }}>All Destinations</div>
+                <div onClick={() => setActiveCategory('Saved')} style={{ fontSize: '15px', padding: '12px 16px', borderRadius: '12px', background: activeCategory === 'Saved' ? 'rgba(214,51,132,0.15)' : 'transparent', color: activeCategory === 'Saved' ? 'var(--violet)' : 'rgba(255,255,255,0.6)', cursor: 'pointer', transition: 'all 0.2s', fontWeight: activeCategory === 'Saved' ? 600 : 500, display: 'flex', alignItems: 'center', justifyItems: 'space-between' }}>Saved Places <Heart size={14} fill={activeCategory === 'Saved' ? 'var(--violet)' : 'transparent'} color={activeCategory === 'Saved' ? 'var(--violet)' : 'rgba(255,255,255,0.4)'} style={{ marginLeft: 'auto' }} /></div>
+                
+                <div onClick={() => setActiveCategory('Monuments')} style={{ fontSize: '15px', padding: '12px 16px', borderRadius: '12px', background: activeCategory === 'Monuments' ? 'rgba(214,51,132,0.15)' : 'transparent', color: activeCategory === 'Monuments' ? 'var(--violet)' : 'rgba(255,255,255,0.6)', cursor: 'pointer', transition: 'all 0.2s', fontWeight: activeCategory === 'Monuments' ? 600 : 500 }}>Monuments</div>
+                
+                <div onClick={() => setActiveCategory('Temples')} style={{ fontSize: '15px', padding: '12px 16px', borderRadius: '12px', background: activeCategory === 'Temples' ? 'rgba(214,51,132,0.15)' : 'transparent', color: activeCategory === 'Temples' ? 'var(--violet)' : 'rgba(255,255,255,0.6)', cursor: 'pointer', transition: 'all 0.2s', fontWeight: activeCategory === 'Temples' ? 600 : 500 }}>Temples</div>
+                
+                <div onClick={() => setActiveCategory('Nature')} style={{ fontSize: '15px', padding: '12px 16px', borderRadius: '12px', background: activeCategory === 'Nature' ? 'rgba(214,51,132,0.15)' : 'transparent', color: activeCategory === 'Nature' ? 'var(--violet)' : 'rgba(255,255,255,0.6)', cursor: 'pointer', transition: 'all 0.2s', fontWeight: activeCategory === 'Nature' ? 600 : 500 }}>Nature</div>
+                
+                <div onClick={() => setActiveCategory('Heritage')} style={{ fontSize: '15px', padding: '12px 16px', borderRadius: '12px', background: activeCategory === 'Heritage' ? 'rgba(214,51,132,0.15)' : 'transparent', color: activeCategory === 'Heritage' ? 'var(--violet)' : 'rgba(255,255,255,0.6)', cursor: 'pointer', transition: 'all 0.2s', fontWeight: activeCategory === 'Heritage' ? 600 : 500 }}>Heritage</div>
+                
+                <div onClick={() => setActiveCategory('Space')} style={{ fontSize: '15px', padding: '12px 16px', borderRadius: '12px', background: activeCategory === 'Space' ? 'rgba(214,51,132,0.15)' : 'transparent', color: activeCategory === 'Space' ? 'var(--violet)' : 'rgba(255,255,255,0.6)', cursor: 'pointer', transition: 'all 0.2s', fontWeight: activeCategory === 'Space' ? 600 : 500 }}>Space</div>
              </div>
 
              {/* Main Content Area (Right Side) */}
