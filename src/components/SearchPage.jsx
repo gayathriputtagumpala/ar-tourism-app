@@ -17,6 +17,7 @@ export default function SearchPage() {
   const [activeCategory, setActiveCategory] = useState('All');
   const [savedPlaces, setSavedPlaces] = useState([]);
   const [isCategoriesExpanded, setIsCategoriesExpanded] = useState(false);
+  const [spokenCharIndex, setSpokenCharIndex] = useState(0);
 
   const TRENDING_PLACES = [
     // --- MONUMENTS ---
@@ -109,6 +110,7 @@ export default function SearchPage() {
     
     // Stop any current audio
     window.speechSynthesis.cancel();
+    setSpokenCharIndex(0);
     
     // Some browsers need a tiny delay after cancel
     setTimeout(() => {
@@ -138,12 +140,24 @@ export default function SearchPage() {
       utterance.onend = () => {
         setIsSpeaking(false);
         isSpeakingRef.current = false;
+        setSpokenCharIndex(0);
       };
 
       utterance.onerror = (e) => {
         console.error("Speech error:", e);
         setIsSpeaking(false);
         isSpeakingRef.current = false;
+        setSpokenCharIndex(0);
+      };
+
+      utterance.onboundary = (e) => {
+        if (e.name === 'word') {
+          setSpokenCharIndex(e.charIndex);
+          if (textContainerRef.current) {
+            const ratio = e.charIndex / text.length;
+            textContainerRef.current.scrollTop = (textContainerRef.current.scrollHeight - textContainerRef.current.clientHeight) * ratio;
+          }
+        }
       };
 
       window.speechSynthesis.speak(utterance);
@@ -155,6 +169,7 @@ export default function SearchPage() {
       window.speechSynthesis.cancel();
       setIsSpeaking(false);
       isSpeakingRef.current = false;
+      setSpokenCharIndex(0);
     } else if (locationData) {
       speakSummary(locationData.summary);
     }
@@ -648,7 +663,18 @@ export default function SearchPage() {
                     color: 'var(--text-dim)',
                     margin: 0
                   }}>
-                    {locationData.summary}
+                    {isSpeaking && spokenCharIndex > 0 ? (
+                      <>
+                        <span style={{ color: 'var(--text)', transition: 'color 0.2s' }}>
+                          {locationData.summary.substring(0, spokenCharIndex)}
+                        </span>
+                        <span>
+                          {locationData.summary.substring(spokenCharIndex)}
+                        </span>
+                      </>
+                    ) : (
+                      locationData.summary
+                    )}
                   </p>
                   
                   {/* Info Grid for Premium Feel */}
