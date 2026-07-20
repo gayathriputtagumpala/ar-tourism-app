@@ -684,29 +684,66 @@ export default function SearchPage() {
                 </div>
 
                 {/* CTA Row from Mockup */}
-                <div style={{ display: 'flex', gap: '10px', marginBottom: '22px' }}>
-                  <div 
-                    onClick={() => setActiveMedia('image')}
-                    style={{ flex: 1, padding: '13px', borderRadius: '14px', textAlign: 'center', fontSize: '13px', fontWeight: '500', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', cursor: 'pointer', background: activeMedia === 'image' ? 'var(--violet-dim)' : 'var(--surface)', border: `1px solid ${activeMedia === 'image' ? 'var(--violet)' : 'var(--line)'}`, color: 'var(--text)', transition: 'all 0.2s' }}
-                  >
-                    🖼️<span>View Image</span><small style={{ fontSize: '10px', opacity: 0.75, fontWeight: 400 }}>High Quality</small>
+                {activeMedia === null && (
+                  <div style={{ display: 'flex', gap: '10px', marginBottom: '22px' }}>
+                    <div 
+                      onClick={() => setActiveMedia('image')}
+                      style={{ flex: 1, padding: '13px', borderRadius: '14px', textAlign: 'center', fontSize: '13px', fontWeight: '500', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', cursor: 'pointer', background: 'var(--surface)', border: '1px solid var(--line)', color: 'var(--text)', transition: 'all 0.2s' }}
+                    >
+                      🖼️<span>View Image</span><small style={{ fontSize: '10px', opacity: 0.75, fontWeight: 400 }}>High Quality</small>
+                    </div>
+                    <div 
+                      onClick={() => setActiveMedia('video')}
+                      style={{ flex: 1, padding: '13px', borderRadius: '14px', textAlign: 'center', fontSize: '13px', fontWeight: '500', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', cursor: 'pointer', background: 'var(--surface)', border: '1px solid var(--line)', color: 'var(--text)', transition: 'all 0.2s' }}
+                    >
+                      ▶<span>Watch video</span><small style={{ fontSize: '10px', opacity: 0.75, fontWeight: 400 }}>Cinematic</small>
+                    </div>
+                    <div 
+                      onClick={() => setActiveMedia('vr')}
+                      style={{ flex: 1, padding: '13px', borderRadius: '14px', textAlign: 'center', fontSize: '13px', fontWeight: '500', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', cursor: 'pointer', background: 'linear-gradient(135deg, var(--cyan), #2fb8b0)', color: '#fff', position: 'relative', overflow: 'hidden' }}
+                    >
+                      <div style={{ position: 'absolute', width: '70px', height: '70px', border: '1px solid rgba(255,255,255,0.35)', borderRadius: '50%', top: '-20px', right: '-20px' }}></div>
+                      <span>Enter VR</span><small style={{ fontSize: '10px', opacity: 0.75, fontWeight: 400 }}>360° immersive</small>
+                    </div>
                   </div>
-                  <div 
-                    onClick={() => setActiveMedia('video')}
-                    style={{ flex: 1, padding: '13px', borderRadius: '14px', textAlign: 'center', fontSize: '13px', fontWeight: '500', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', cursor: 'pointer', background: activeMedia === 'video' ? 'var(--violet-dim)' : 'var(--surface)', border: `1px solid ${activeMedia === 'video' ? 'var(--violet)' : 'var(--line)'}`, color: 'var(--text)', transition: 'all 0.2s' }}
-                  >
-                    ▶<span>Watch video</span><small style={{ fontSize: '10px', opacity: 0.75, fontWeight: 400 }}>Cinematic</small>
-                  </div>
-                  <div 
-                    onClick={() => setActiveMedia('vr')}
-                    style={{ flex: 1, padding: '13px', borderRadius: '14px', textAlign: 'center', fontSize: '13px', fontWeight: '500', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', cursor: 'pointer', background: 'linear-gradient(135deg, var(--cyan), #2fb8b0)', color: '#fff', position: 'relative', overflow: 'hidden' }}
-                  >
-                    <div style={{ position: 'absolute', width: '70px', height: '70px', border: '1px solid rgba(255,255,255,0.35)', borderRadius: '50%', top: '-20px', right: '-20px' }}></div>
-                    <span>Enter VR</span><small style={{ fontSize: '10px', opacity: 0.75, fontWeight: 400 }}>360° immersive</small>
-                  </div>
-                </div>
+                )}
 
-                {/* Text and content block completely removed as per requirement */}
+                {/* Content / Text Matter */}
+                {activeMedia !== null && (
+                  <>
+                    <button 
+                      onClick={() => setActiveMedia(null)}
+                      style={{
+                        background: 'transparent', border: '1px solid var(--line)', color: 'var(--text)', 
+                        padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', marginBottom: '20px',
+                        display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', fontWeight: '500'
+                      }}
+                    >
+                      ← Change Media
+                    </button>
+                    <div ref={textContainerRef} style={{ flex: 1, overflowY: 'auto', paddingRight: '20px', scrollBehavior: 'smooth' }}>
+                      <p style={{ 
+                        fontSize: '1.25rem', 
+                        lineHeight: '1.8', 
+                        color: 'var(--text-dim)',
+                        margin: 0
+                      }}>
+                        {activeMedia === 'vr' ? (
+                          locationData.summary
+                        ) : (
+                          <>
+                            <span style={{ color: 'var(--text)', transition: 'color 0.2s' }}>
+                              {locationData.summary.substring(0, spokenCharIndex)}
+                            </span>
+                            <span style={{ opacity: 0 }}>
+                              {locationData.summary.substring(spokenCharIndex)}
+                            </span>
+                          </>
+                        )}
+                      </p>
+                    </div>
+                  </>
+                )}
               </div>
           </div>
         )}
