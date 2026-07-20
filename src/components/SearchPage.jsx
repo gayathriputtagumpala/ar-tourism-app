@@ -474,116 +474,116 @@ export default function SearchPage() {
           }}>
             
             {/* Media Section */}
-            <div style={{
-              flex: '0 0 55%',
-              background: '#000',
-              position: 'relative',
-              display: 'flex', 
-              alignItems: 'center',
-              justifyContent: 'center',
-              overflow: 'hidden',
-              boxShadow: '20px 0 50px rgba(0,0,0,0.5)',
-              zIndex: 5
-            }}>
-              {activeMedia === 'vr' ? (
-                locationData.vrYoutubeId ? (
-                  <iframe 
-                    width="100%" 
-                    height="100%" 
-                    src={`https://www.youtube.com/embed/${locationData.vrYoutubeId}?autoplay=1&mute=1&loop=1&playlist=${locationData.vrYoutubeId}&controls=1&modestbranding=1&rel=0`} 
-                    title="YouTube VR video player" 
-                    frameBorder="0" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                    style={{ objectFit: 'cover' }}
-                  ></iframe>
+            {activeMedia !== null && (
+              <div style={{
+                flex: '0 0 55%',
+                background: '#000',
+                position: 'relative',
+                display: 'flex', 
+                alignItems: 'center',
+                justifyContent: 'center',
+                overflow: 'hidden',
+                boxShadow: '20px 0 50px rgba(0,0,0,0.5)',
+                zIndex: 5
+              }}>
+                {activeMedia === 'vr' ? (
+                  locationData.vrYoutubeId ? (
+                    <iframe 
+                      width="100%" 
+                      height="100%" 
+                      src={`https://www.youtube.com/embed/${locationData.vrYoutubeId}?autoplay=1&mute=1&loop=1&playlist=${locationData.vrYoutubeId}&controls=1&modestbranding=1&rel=0`} 
+                      title="YouTube VR video player" 
+                      frameBorder="0" 
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                      style={{ objectFit: 'cover' }}
+                    ></iframe>
+                  ) : (
+                    <div style={{ textAlign: 'center', padding: '40px', display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', height: '100%', position: 'relative', justifyContent: 'center' }}>
+                      {locationData.imageUrl && (
+                        <img src={locationData.imageUrl} alt="Fallback" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.2, filter: 'blur(5px)' }} />
+                      )}
+                      <div style={{ position: 'relative', zIndex: 10 }}>
+                        <Camera size={64} color="var(--cyan)" style={{ marginBottom: '20px' }} />
+                        <h3 style={{ color: 'var(--text)', marginBottom: '20px', fontSize: '1.8rem', fontFamily: "'Space Grotesk', sans-serif" }}>VR Video Not Available</h3>
+                        <p style={{ color: 'var(--text-dim)', fontSize: '1.2rem', maxWidth: '300px' }}>We couldn't find a high-quality 360° VR video for this specific location.</p>
+                      </div>
+                    </div>
+                  )
+                ) : activeMedia === 'video' && locationData.youtubeId ? (
+                  <>
+                    <iframe 
+                      ref={videoIframeRef}
+                      width="100%" 
+                      height="100%" 
+                      src={`https://www.youtube.com/embed/${locationData.youtubeId}?autoplay=1&mute=1&loop=1&playlist=${locationData.youtubeId}&controls=0&modestbranding=1&rel=0&enablejsapi=1`} 
+                      title="YouTube video player" 
+                      frameBorder="0" 
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                      style={{ objectFit: 'cover', transform: 'scale(1.4)', pointerEvents: 'none' }}
+                    ></iframe>
+                    {/* Custom Play/Pause Overlay */}
+                    <div 
+                      onClick={toggleVideoPlay}
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        zIndex: 10,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                        background: isVideoPlaying ? 'transparent' : 'rgba(0,0,0,0.3)',
+                        transition: 'background 0.3s ease'
+                      }}
+                    >
+                      <div style={{
+                        background: 'rgba(20, 20, 43, 0.7)',
+                        backdropFilter: 'blur(10px)',
+                        padding: '20px',
+                        borderRadius: '50%',
+                        opacity: isVideoPlaying ? 0 : 1,
+                        transform: isVideoPlaying ? 'scale(0.8)' : 'scale(1)',
+                        transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                        boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
+                        border: '1px solid rgba(255,255,255,0.2)'
+                      }}>
+                        {isVideoPlaying ? <Play size={40} color="white" /> : <Pause size={40} color="white" />}
+                      </div>
+                    </div>
+                  </>
+                ) : locationData.videoUrl && !videoFailed ? (
+                  <video 
+                    src={locationData.videoUrl} 
+                    autoPlay 
+                    loop 
+                    muted 
+                    playsInline
+                    onError={() => setVideoFailed(true)}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                  />
+                ) : activeMedia === 'image' && locationData.imageUrl ? (
+                  <img 
+                    src={locationData.imageUrl} 
+                    alt={locationData.name} 
+                    style={{ 
+                      width: '100%', 
+                      height: '100%', 
+                      objectFit: 'cover'
+                    }} 
+                  />
                 ) : (
-                  <div style={{ textAlign: 'center', padding: '40px', display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', height: '100%', position: 'relative', justifyContent: 'center' }}>
-                    {locationData.imageUrl && (
-                      <img src={locationData.imageUrl} alt="Fallback" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.2, filter: 'blur(5px)' }} />
-                    )}
-                    <div style={{ position: 'relative', zIndex: 10 }}>
-                      <Camera size={64} color="var(--cyan)" style={{ marginBottom: '20px' }} />
-                      <h3 style={{ color: 'var(--text)', marginBottom: '20px', fontSize: '1.8rem', fontFamily: "'Space Grotesk', sans-serif" }}>VR Video Not Available</h3>
-                      <p style={{ color: 'var(--text-dim)', fontSize: '1.2rem', maxWidth: '300px' }}>We couldn't find a high-quality 360° VR video for this specific location.</p>
-                    </div>
+                  <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', color: 'rgba(255,255,255,0.3)' }}>
+                    <ImageIcon size={48} />
+                    <p>No Visuals Available</p>
                   </div>
-                )
-              ) : activeMedia === 'video' && locationData.youtubeId ? (
-                <>
-                  <iframe 
-                    ref={videoIframeRef}
-                    width="100%" 
-                    height="100%" 
-                    src={`https://www.youtube.com/embed/${locationData.youtubeId}?autoplay=1&mute=1&loop=1&playlist=${locationData.youtubeId}&controls=0&modestbranding=1&rel=0&enablejsapi=1`} 
-                    title="YouTube video player" 
-                    frameBorder="0" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                    style={{ objectFit: 'cover', transform: 'scale(1.4)', pointerEvents: 'none' }}
-                  ></iframe>
-                  {/* Custom Play/Pause Overlay */}
-                  <div 
-                    onClick={toggleVideoPlay}
-                    style={{
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      zIndex: 10,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      cursor: 'pointer',
-                      background: isVideoPlaying ? 'transparent' : 'rgba(0,0,0,0.3)',
-                      transition: 'background 0.3s ease'
-                    }}
-                  >
-                    <div style={{
-                      background: 'rgba(20, 20, 43, 0.7)',
-                      backdropFilter: 'blur(10px)',
-                      padding: '20px',
-                      borderRadius: '50%',
-                      opacity: isVideoPlaying ? 0 : 1,
-                      transform: isVideoPlaying ? 'scale(0.8)' : 'scale(1)',
-                      transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                      boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
-                      border: '1px solid rgba(255,255,255,0.2)'
-                    }}>
-                      {isVideoPlaying ? <Play size={40} color="white" /> : <Pause size={40} color="white" />}
-                    </div>
-                  </div>
-                </>
-              ) : locationData.videoUrl && !videoFailed ? (
-                <video 
-                  src={locationData.videoUrl} 
-                  autoPlay 
-                  loop 
-                  muted 
-                  playsInline
-                  onError={() => setVideoFailed(true)}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-                />
-              ) : activeMedia === 'image' && locationData.imageUrl ? (
-                <img 
-                  src={locationData.imageUrl} 
-                  alt={locationData.name} 
-                  style={{ 
-                    width: '100%', 
-                    height: '100%', 
-                    objectFit: 'cover'
-                  }} 
-                />
-              ) : activeMedia === null ? (
-                <div style={{ width: '100%', height: '100%', background: 'transparent' }} />
-              ) : (
-                <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', color: 'rgba(255,255,255,0.3)' }}>
-                  <ImageIcon size={48} />
-                  <p>No Visuals Available</p>
-                </div>
-              )}
-              {/* Gradient Overlay for blending */}
-              <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '40%', background: 'linear-gradient(to right, transparent, #fffcf5)', pointerEvents: 'none' }} />
-            </div>
+                )}
+                {/* Gradient Overlay for blending */}
+                <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '40%', background: 'linear-gradient(to right, transparent, #fffcf5)', pointerEvents: 'none' }} />
+              </div>
+            )}
 
             {/* Content Section */}
             <div style={{ padding: '40px 50px', flex: '1', display: 'flex', flexDirection: 'column', background: 'transparent' }}>
