@@ -191,13 +191,13 @@ export default function SearchPage() {
     // Some browsers need a tiny delay after cancel
     setTimeout(() => {
       const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = speechLang;
       
       // Load voices and select based on speechLang
       const availableVoices = window.speechSynthesis.getVoices();
       
       const selectedVoice = availableVoices.find(v => v.lang === speechLang) 
-                        || availableVoices.find(v => v.lang.includes(speechLang.split('-')[0])) 
-                        || availableVoices[0];
+                        || availableVoices.find(v => v.lang.includes(speechLang.split('-')[0]));
       
       if (selectedVoice) {
         utterance.voice = selectedVoice;
