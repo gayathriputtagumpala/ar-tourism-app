@@ -107,7 +107,7 @@ export default function SearchPage() {
         audioRef.current.pause();
       }
       if (locationData && !isSpeakingRef.current) {
-        speakSummary(locationData.summary);
+        speakSummary(translatedData ? translatedData.summary : locationData.summary);
       }
     } else {
       if (audioRef.current) {
@@ -118,7 +118,7 @@ export default function SearchPage() {
       isSpeakingRef.current = false;
       setSpokenCharIndex(0);
     }
-  }, [activeMedia, locationData]);
+  }, [activeMedia, locationData, translatedData]);
 
   const toggleVideoPlay = (e) => {
     e.stopPropagation();
