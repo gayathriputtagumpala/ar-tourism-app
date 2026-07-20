@@ -101,12 +101,23 @@ export default function SearchPage() {
         audioRef.current.volume = 0.4;
         audioRef.current.play().catch(e => console.log("Audio play failed:", e));
       }
+    } else if (activeMedia === 'image' || activeMedia === 'video') {
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+      if (locationData && !isSpeakingRef.current) {
+        speakSummary(locationData.summary);
+      }
     } else {
       if (audioRef.current) {
         audioRef.current.pause();
       }
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+      isSpeakingRef.current = false;
+      setSpokenCharIndex(0);
     }
-  }, [activeMedia]);
+  }, [activeMedia, locationData]);
 
   const toggleVideoPlay = (e) => {
     e.stopPropagation();
@@ -695,7 +706,56 @@ export default function SearchPage() {
                   </div>
                 </div>
 
-                {/* Text and Info Grid Removed As Requested */}
+                {/* Ref added for auto-scrolling */}
+                {activeMedia !== null && (
+                  <div ref={textContainerRef} style={{ flex: 1, overflowY: 'auto', paddingRight: '20px', scrollBehavior: 'smooth' }}>
+                    <p style={{ 
+                      fontSize: '1.25rem', 
+                      lineHeight: '1.8', 
+                      color: 'var(--text-dim)',
+                      margin: 0
+                    }}>
+                      {isSpeaking && spokenCharIndex > 0 ? (
+                        <>
+                          <span style={{ color: 'var(--text)', transition: 'color 0.2s' }}>
+                            {locationData.summary.substring(0, spokenCharIndex)}
+                          </span>
+                          <span>
+                            {locationData.summary.substring(spokenCharIndex)}
+                          </span>
+                        </>
+                      ) : (
+                        locationData.summary
+                      )}
+                    </p>
+                    
+                    {/* Info Grid for Premium Feel */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginTop: '40px' }}>
+                      <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: '14px', padding: '15px' }}>
+                        <span style={{ fontSize: '11px', color: 'var(--text-faint)', display: 'block', marginBottom: '6px' }}>Built / Established</span>
+                        <strong style={{ fontSize: '15px', fontWeight: '500', color: 'var(--text)' }}>
+                          {locationData.name.toLowerCase().includes('taj') ? '1631–1653' : 'Historical Era'}
+                        </strong>
+                      </div>
+                      <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: '14px', padding: '15px' }}>
+                        <span style={{ fontSize: '11px', color: 'var(--text-faint)', display: 'block', marginBottom: '6px' }}>Best time</span>
+                        <strong style={{ fontSize: '15px', fontWeight: '500', color: 'var(--text)' }}>
+                          {locationData.name.toLowerCase().includes('taj') ? 'Oct – Mar' : 'Spring / Fall'}
+                        </strong>
+                      </div>
+                      <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: '14px', padding: '15px' }}>
+                        <span style={{ fontSize: '11px', color: 'var(--text-faint)', display: 'block', marginBottom: '6px' }}>Rating</span>
+                        <strong style={{ fontSize: '15px', fontWeight: '500', color: 'var(--text)' }}>4.8 ★</strong>
+                      </div>
+                      <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: '14px', padding: '15px' }}>
+                        <span style={{ fontSize: '11px', color: 'var(--text-faint)', display: 'block', marginBottom: '6px' }}>Entry fee</span>
+                        <strong style={{ fontSize: '15px', fontWeight: '500', color: 'var(--text)' }}>
+                          {locationData.name.toLowerCase().includes('taj') ? '₹50 / ₹1100' : 'Varies'}
+                        </strong>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
           </div>
         )}
