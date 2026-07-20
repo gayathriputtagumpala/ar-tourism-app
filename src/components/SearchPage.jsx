@@ -19,6 +19,7 @@ export default function SearchPage() {
   const [isCategoriesExpanded, setIsCategoriesExpanded] = useState(false);
   const [spokenCharIndex, setSpokenCharIndex] = useState(0);
   const [speechLang, setSpeechLang] = useState('en-IN');
+  const [translatedData, setTranslatedData] = useState(null);
 
   const TRENDING_PLACES = [
     // --- MONUMENTS ---
@@ -136,10 +137,49 @@ export default function SearchPage() {
   }, []);
 
   useEffect(() => {
-    if (isSpeakingRef.current && locationData) {
-      speakSummary(locationData.summary);
+    if (!locationData) return;
+    
+    if (speechLang.startsWith('en')) {
+      setTranslatedData(null);
+      if (isSpeakingRef.current) {
+        speakSummary(locationData.summary);
+      }
+      return;
     }
-  }, [speechLang]);
+
+    const targetLangCode = speechLang.split('-')[0];
+    
+    const translate = async () => {
+      try {
+        const textToTranslate = locationData.name + "|||" + locationData.summary;
+        const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLangCode}&dt=t&q=${encodeURIComponent(textToTranslate)}`);
+        const data = await res.json();
+        
+        const translatedText = data[0].map(x => x[0]).join('');
+        const parts = translatedText.split('|||');
+        const translatedName = parts[0].trim();
+        const translatedSummary = parts.slice(1).join('|||').trim();
+        
+        const newTranslatedData = {
+          name: translatedName || locationData.name,
+          summary: translatedSummary || locationData.summary
+        };
+        
+        setTranslatedData(newTranslatedData);
+        if (isSpeakingRef.current) {
+          speakSummary(newTranslatedData.summary);
+        }
+      } catch (err) {
+        console.error("Translation failed:", err);
+        setTranslatedData(null);
+        if (isSpeakingRef.current) {
+          speakSummary(locationData.summary);
+        }
+      }
+    };
+    
+    translate();
+  }, [speechLang, locationData]);
 
   const speakSummary = (text) => {
     if (!text) return;
@@ -618,7 +658,7 @@ export default function SearchPage() {
                       gap: '12px'
                     }}>
                       <MapPin color="var(--violet)" size={32} />
-                      {locationData.name}
+                      {translatedData ? translatedData.name : locationData.name}
                     </h2>
                     <div style={{ height: '4px', width: '60px', background: 'linear-gradient(135deg, var(--violet), var(--cyan))', borderRadius: '2px', marginTop: '10px' }} />
                   </div>
@@ -737,14 +777,14 @@ export default function SearchPage() {
                         margin: 0
                       }}>
                         {activeMedia === 'vr' ? (
-                          locationData.summary
+                          (translatedData ? translatedData.summary : locationData.summary)
                         ) : (
                           <>
                             <span style={{ color: 'var(--text)', transition: 'color 0.2s' }}>
-                              {locationData.summary.substring(0, spokenCharIndex)}
+                              {(translatedData ? translatedData.summary : locationData.summary).substring(0, spokenCharIndex)}
                             </span>
                             <span style={{ opacity: 0 }}>
-                              {locationData.summary.substring(spokenCharIndex)}
+                              {(translatedData ? translatedData.summary : locationData.summary).substring(spokenCharIndex)}
                             </span>
                           </>
                         )}
