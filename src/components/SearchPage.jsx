@@ -18,6 +18,7 @@ export default function SearchPage() {
   const [savedPlaces, setSavedPlaces] = useState([]);
   const [isCategoriesExpanded, setIsCategoriesExpanded] = useState(false);
   const [spokenCharIndex, setSpokenCharIndex] = useState(0);
+  const [speechLang, setSpeechLang] = useState('en-IN');
 
   const TRENDING_PLACES = [
     // --- MONUMENTS ---
@@ -88,6 +89,24 @@ export default function SearchPage() {
   const isSpeakingRef = useRef(false);
   const textContainerRef = useRef(null);
   const videoIframeRef = useRef(null);
+  const audioRef = useRef(null);
+
+  useEffect(() => {
+    if (activeMedia === 'vr') {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+      isSpeakingRef.current = false;
+      setSpokenCharIndex(0);
+      if (audioRef.current) {
+        audioRef.current.volume = 0.4;
+        audioRef.current.play().catch(e => console.log("Audio play failed:", e));
+      }
+    } else {
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+    }
+  }, [activeMedia]);
 
   const toggleVideoPlay = (e) => {
     e.stopPropagation();
@@ -116,16 +135,15 @@ export default function SearchPage() {
     setTimeout(() => {
       const utterance = new SpeechSynthesisUtterance(text);
       
-      // Load voices to avoid Chrome silent failure
+      // Load voices and select based on speechLang
       const availableVoices = window.speechSynthesis.getVoices();
       
-      // Explicitly set an English voice, preferably Google US or UK
-      const englishVoice = availableVoices.find(v => v.lang.includes('en-') && v.name.includes('Google')) 
-                        || availableVoices.find(v => v.lang.includes('en-')) 
+      const selectedVoice = availableVoices.find(v => v.lang === speechLang) 
+                        || availableVoices.find(v => v.lang.includes(speechLang.split('-')[0])) 
                         || availableVoices[0];
       
-      if (englishVoice) {
-        utterance.voice = englishVoice;
+      if (selectedVoice) {
+        utterance.voice = selectedVoice;
       }
       
       // Slightly slow down speech for better AI narration feel
@@ -275,6 +293,7 @@ export default function SearchPage() {
       '--text-dim': '#555555',
       '--text-faint': '#888888'
     }}>
+      <audio ref={audioRef} src="https://actions.google.com/sounds/v1/ambiences/meditation_bell_and_river.ogg" loop />
       
       {/* Background from Mockup */}
       <div style={{
@@ -586,7 +605,27 @@ export default function SearchPage() {
                     <div style={{ height: '4px', width: '60px', background: 'linear-gradient(135deg, var(--violet), var(--cyan))', borderRadius: '2px', marginTop: '10px' }} />
                   </div>
                   
-                  <div style={{ display: 'flex', gap: '15px' }}>
+                  <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+                    <select 
+                      value={speechLang}
+                      onChange={(e) => setSpeechLang(e.target.value)}
+                      style={{
+                        background: 'rgba(255, 255, 255, 0.1)',
+                        border: '1px solid rgba(255,255,255,0.2)',
+                        borderRadius: '20px',
+                        padding: '8px 12px',
+                        color: 'var(--text)',
+                        fontSize: '13px',
+                        outline: 'none',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <option value="en-IN" style={{ color: 'black' }}>English (India)</option>
+                      <option value="en-US" style={{ color: 'black' }}>English (US)</option>
+                      <option value="en-GB" style={{ color: 'black' }}>English (UK)</option>
+                      <option value="en-AU" style={{ color: 'black' }}>English (Australia)</option>
+                    </select>
+
                     <button 
                       onClick={() => {
                         if (savedPlaces.includes(locationData.name)) {
