@@ -266,8 +266,7 @@ export default function SearchPage() {
       };
       setLocationData(newData);
       setVideoFailed(false);
-      setActiveMedia(youtubeId ? 'video' : 'image');
-      setTimeout(() => speakSummary(newData.summary), 500);
+      setActiveMedia(null);
       
     } catch (error) {
       console.error("Search failed:", error);
@@ -564,7 +563,7 @@ export default function SearchPage() {
                   onError={() => setVideoFailed(true)}
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                 />
-              ) : locationData.imageUrl ? (
+              ) : activeMedia === 'image' && locationData.imageUrl ? (
                 <img 
                   src={locationData.imageUrl} 
                   alt={locationData.name} 
@@ -574,6 +573,15 @@ export default function SearchPage() {
                     objectFit: 'cover'
                   }} 
                 />
+              ) : activeMedia === null ? (
+                <div style={{ textAlign: 'center', padding: '40px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', color: 'var(--text-dim)' }}>
+                  <div style={{ marginBottom: '20px', display: 'flex', gap: '20px' }}>
+                    <ImageIcon size={48} color="rgba(255,255,255,0.2)" />
+                    <Play size={48} color="rgba(255,255,255,0.2)" />
+                  </div>
+                  <h3 style={{ fontSize: '1.8rem', fontFamily: "'Space Grotesk', sans-serif", color: 'var(--text)', marginBottom: '10px' }}>Select Media Type</h3>
+                  <p style={{ fontSize: '1.1rem', maxWidth: '300px' }}>Choose View Image, Watch Video, or Enter VR from the right panel to explore this destination.</p>
+                </div>
               ) : (
                 <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', color: 'rgba(255,255,255,0.3)' }}>
                   <ImageIcon size={48} />
@@ -695,53 +703,55 @@ export default function SearchPage() {
                 </div>
 
                 {/* Ref added for auto-scrolling */}
-                <div ref={textContainerRef} style={{ flex: 1, overflowY: 'auto', paddingRight: '20px', scrollBehavior: 'smooth' }}>
-                  <p style={{ 
-                    fontSize: '1.25rem', 
-                    lineHeight: '1.8', 
-                    color: 'var(--text-dim)',
-                    margin: 0
-                  }}>
-                    {isSpeaking && spokenCharIndex > 0 ? (
-                      <>
-                        <span style={{ color: 'var(--text)', transition: 'color 0.2s' }}>
-                          {locationData.summary.substring(0, spokenCharIndex)}
-                        </span>
-                        <span>
-                          {locationData.summary.substring(spokenCharIndex)}
-                        </span>
-                      </>
-                    ) : (
-                      locationData.summary
-                    )}
-                  </p>
-                  
-                  {/* Info Grid for Premium Feel */}
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginTop: '40px' }}>
-                    <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: '14px', padding: '15px' }}>
-                      <span style={{ fontSize: '11px', color: 'var(--text-faint)', display: 'block', marginBottom: '6px' }}>Built / Established</span>
-                      <strong style={{ fontSize: '15px', fontWeight: '500', color: 'var(--text)' }}>
-                        {locationData.name.toLowerCase().includes('taj') ? '1631–1653' : 'Historical Era'}
-                      </strong>
-                    </div>
-                    <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: '14px', padding: '15px' }}>
-                      <span style={{ fontSize: '11px', color: 'var(--text-faint)', display: 'block', marginBottom: '6px' }}>Best time</span>
-                      <strong style={{ fontSize: '15px', fontWeight: '500', color: 'var(--text)' }}>
-                        {locationData.name.toLowerCase().includes('taj') ? 'Oct – Mar' : 'Spring / Fall'}
-                      </strong>
-                    </div>
-                    <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: '14px', padding: '15px' }}>
-                      <span style={{ fontSize: '11px', color: 'var(--text-faint)', display: 'block', marginBottom: '6px' }}>Rating</span>
-                      <strong style={{ fontSize: '15px', fontWeight: '500', color: 'var(--text)' }}>4.8 ★</strong>
-                    </div>
-                    <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: '14px', padding: '15px' }}>
-                      <span style={{ fontSize: '11px', color: 'var(--text-faint)', display: 'block', marginBottom: '6px' }}>Entry fee</span>
-                      <strong style={{ fontSize: '15px', fontWeight: '500', color: 'var(--text)' }}>
-                        {locationData.name.toLowerCase().includes('taj') ? '₹50 / ₹1100' : 'Varies'}
-                      </strong>
+                {activeMedia !== null && (
+                  <div ref={textContainerRef} style={{ flex: 1, overflowY: 'auto', paddingRight: '20px', scrollBehavior: 'smooth' }}>
+                    <p style={{ 
+                      fontSize: '1.25rem', 
+                      lineHeight: '1.8', 
+                      color: 'var(--text-dim)',
+                      margin: 0
+                    }}>
+                      {isSpeaking && spokenCharIndex > 0 ? (
+                        <>
+                          <span style={{ color: 'var(--text)', transition: 'color 0.2s' }}>
+                            {locationData.summary.substring(0, spokenCharIndex)}
+                          </span>
+                          <span>
+                            {locationData.summary.substring(spokenCharIndex)}
+                          </span>
+                        </>
+                      ) : (
+                        locationData.summary
+                      )}
+                    </p>
+                    
+                    {/* Info Grid for Premium Feel */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginTop: '40px' }}>
+                      <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: '14px', padding: '15px' }}>
+                        <span style={{ fontSize: '11px', color: 'var(--text-faint)', display: 'block', marginBottom: '6px' }}>Built / Established</span>
+                        <strong style={{ fontSize: '15px', fontWeight: '500', color: 'var(--text)' }}>
+                          {locationData.name.toLowerCase().includes('taj') ? '1631–1653' : 'Historical Era'}
+                        </strong>
+                      </div>
+                      <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: '14px', padding: '15px' }}>
+                        <span style={{ fontSize: '11px', color: 'var(--text-faint)', display: 'block', marginBottom: '6px' }}>Best time</span>
+                        <strong style={{ fontSize: '15px', fontWeight: '500', color: 'var(--text)' }}>
+                          {locationData.name.toLowerCase().includes('taj') ? 'Oct – Mar' : 'Spring / Fall'}
+                        </strong>
+                      </div>
+                      <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: '14px', padding: '15px' }}>
+                        <span style={{ fontSize: '11px', color: 'var(--text-faint)', display: 'block', marginBottom: '6px' }}>Rating</span>
+                        <strong style={{ fontSize: '15px', fontWeight: '500', color: 'var(--text)' }}>4.8 ★</strong>
+                      </div>
+                      <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: '14px', padding: '15px' }}>
+                        <span style={{ fontSize: '11px', color: 'var(--text-faint)', display: 'block', marginBottom: '6px' }}>Entry fee</span>
+                        <strong style={{ fontSize: '15px', fontWeight: '500', color: 'var(--text)' }}>
+                          {locationData.name.toLowerCase().includes('taj') ? '₹50 / ₹1100' : 'Varies'}
+                        </strong>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
               </div>
           </div>
         )}
