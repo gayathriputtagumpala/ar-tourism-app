@@ -91,6 +91,7 @@ export default function SearchPage() {
   const textContainerRef = useRef(null);
   const videoIframeRef = useRef(null);
   const audioRef = useRef(null);
+  const cloudAudioRef = useRef(null);
 
   useEffect(() => {
     if (activeMedia === 'vr') {
@@ -112,6 +113,9 @@ export default function SearchPage() {
     } else {
       if (audioRef.current) {
         audioRef.current.pause();
+      }
+      if (cloudAudioRef.current) {
+        cloudAudioRef.current.pause();
       }
       window.speechSynthesis.cancel();
       setIsSpeaking(false);
@@ -186,62 +190,149 @@ export default function SearchPage() {
     
     // Stop any current audio
     window.speechSynthesis.cancel();
+    if (cloudAudioRef.current) {
+      cloudAudioRef.current.pause();
+    }
     setSpokenCharIndex(0);
     
-    // Some browsers need a tiny delay after cancel
     setTimeout(() => {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = speechLang;
-      
-      // Load voices and select based on speechLang
-      const availableVoices = window.speechSynthesis.getVoices();
-      
-      const selectedVoice = availableVoices.find(v => v.lang === speechLang) 
-                        || availableVoices.find(v => v.lang.includes(speechLang.split('-')[0]));
-      
-      if (selectedVoice) {
-        utterance.voice = selectedVoice;
-      }
-      
-      // Slightly slow down speech for better AI narration feel
-      utterance.rate = 0.95;
-      utterance.pitch = 1;
-      
-      utterance.onstart = () => {
+      if (!speechLang.startsWith('en')) {
+        // Use Google Cloud TTS via audio tag for regional Indian languages
+        const langCode = speechLang.split('-')[0];
+        const sentences = text.match(/[^.!?।\n]+[.!?।\n]+/g) || [text];
+        let chunks = [];
+        let curr = "";
+        sentences.forEach(s => {
+          if (curr.length + s.length > 150) {
+             if (curr) chunks.push(curr);
+             curr = s;
+          } else {
+             curr += s;
+          }
+        });
+        if (curr) chunks.push(curr);
+        
+        let currentChunkIdx = 0;
+        let cumulativeChars = 0;
+        
         setIsSpeaking(true);
         isSpeakingRef.current = true;
-      };
-
-      utterance.onend = () => {
-        setIsSpeaking(false);
-        isSpeakingRef.current = false;
-        setSpokenCharIndex(0);
-      };
-
-      utterance.onerror = (e) => {
-        console.error("Speech error:", e);
-        setIsSpeaking(false);
-        isSpeakingRef.current = false;
-        setSpokenCharIndex(0);
-      };
-
-      utterance.onboundary = (e) => {
-        if (e.name === 'word') {
-          setSpokenCharIndex(e.charIndex);
-          if (textContainerRef.current) {
-            const ratio = e.charIndex / text.length;
-            textContainerRef.current.scrollTop = (textContainerRef.current.scrollHeight - textContainerRef.current.clientHeight) * ratio;
+        
+        const playNextChunk = () => {
+          if (!isSpeakingRef.current || currentChunkIdx >= chunks.length) {
+            setIsSpeaking(false);
+            isSpeakingRef.current = false;
+            setSpokenCharIndex(text.length); 
+            return;
           }
+          
+          const chunkText = chunks[currentChunkIdx];
+          const url = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=${langCode}&q=${encodeURIComponent(chunkText)}`;
+          const audio = new Audio(url);
+          cloudAudioRef.current = audio;
+          
+          let animationFrame;
+          const startSync = () => {
+            const sync = () => {
+              if (audio.duration && !audio.paused) {
+                 const ratio = audio.currentTime / audio.duration;
+                 const chars = cumulativeChars + Math.floor(ratio * chunkText.length);
+                 setSpokenCharIndex(chars);
+                 if (textContainerRef.current) {
+                   const scrollRatio = chars / text.length;
+                   textContainerRef.current.scrollTop = (textContainerRef.current.scrollHeight - textContainerRef.current.clientHeight) * scrollRatio;
+                 }
+              }
+              if (isSpeakingRef.current && currentChunkIdx < chunks.length) {
+                 animationFrame = requestAnimationFrame(sync);
+              }
+            };
+            sync();
+          };
+          
+          audio.onplay = () => {
+            startSync();
+          };
+          
+          audio.onended = () => {
+             cancelAnimationFrame(animationFrame);
+             cumulativeChars += chunkText.length;
+             currentChunkIdx++;
+             playNextChunk();
+          };
+          
+          audio.onerror = () => {
+             cancelAnimationFrame(animationFrame);
+             cumulativeChars += chunkText.length;
+             currentChunkIdx++;
+             playNextChunk();
+          };
+          
+          audio.play().catch(e => {
+            console.error("Audio playback blocked", e);
+            cancelAnimationFrame(animationFrame);
+            cumulativeChars += chunkText.length;
+            currentChunkIdx++;
+            playNextChunk();
+          });
+        };
+        
+        playNextChunk();
+        
+      } else {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = speechLang;
+        
+        const availableVoices = window.speechSynthesis.getVoices();
+        const selectedVoice = availableVoices.find(v => v.lang === speechLang) 
+                          || availableVoices.find(v => v.lang.includes(speechLang.split('-')[0]));
+        
+        if (selectedVoice) {
+          utterance.voice = selectedVoice;
         }
-      };
-
-      window.speechSynthesis.speak(utterance);
+        
+        utterance.rate = 0.95;
+        utterance.pitch = 1;
+        
+        utterance.onstart = () => {
+          setIsSpeaking(true);
+          isSpeakingRef.current = true;
+        };
+  
+        utterance.onend = () => {
+          setIsSpeaking(false);
+          isSpeakingRef.current = false;
+          setSpokenCharIndex(0);
+        };
+  
+        utterance.onerror = (e) => {
+          console.error("Speech error:", e);
+          setIsSpeaking(false);
+          isSpeakingRef.current = false;
+          setSpokenCharIndex(0);
+        };
+  
+        utterance.onboundary = (e) => {
+          if (e.name === 'word') {
+            setSpokenCharIndex(e.charIndex);
+            if (textContainerRef.current) {
+              const ratio = e.charIndex / text.length;
+              textContainerRef.current.scrollTop = (textContainerRef.current.scrollHeight - textContainerRef.current.clientHeight) * ratio;
+            }
+          }
+        };
+  
+        window.speechSynthesis.speak(utterance);
+      }
     }, 50);
   };
-
+  
   const toggleSpeech = () => {
     if (isSpeaking) {
       window.speechSynthesis.cancel();
+      if (cloudAudioRef.current) {
+        cloudAudioRef.current.pause();
+      }
       setIsSpeaking(false);
       isSpeakingRef.current = false;
       setSpokenCharIndex(0);
