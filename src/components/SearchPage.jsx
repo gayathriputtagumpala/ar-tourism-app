@@ -135,6 +135,12 @@ export default function SearchPage() {
     };
   }, []);
 
+  useEffect(() => {
+    if (isSpeakingRef.current && locationData) {
+      speakSummary(locationData.summary);
+    }
+  }, [speechLang]);
+
   const speakSummary = (text) => {
     if (!text) return;
     
@@ -633,9 +639,11 @@ export default function SearchPage() {
                       }}
                     >
                       <option value="en-IN" style={{ color: 'black' }}>English (India)</option>
-                      <option value="en-US" style={{ color: 'black' }}>English (US)</option>
-                      <option value="en-GB" style={{ color: 'black' }}>English (UK)</option>
-                      <option value="en-AU" style={{ color: 'black' }}>English (Australia)</option>
+                      <option value="hi-IN" style={{ color: 'black' }}>Hindi (India)</option>
+                      <option value="ta-IN" style={{ color: 'black' }}>Tamil (India)</option>
+                      <option value="te-IN" style={{ color: 'black' }}>Telugu (India)</option>
+                      <option value="kn-IN" style={{ color: 'black' }}>Kannada (India)</option>
+                      <option value="ml-IN" style={{ color: 'black' }}>Malayalam (India)</option>
                     </select>
 
                     <button 
