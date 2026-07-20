@@ -715,45 +715,19 @@ export default function SearchPage() {
                       color: 'var(--text-dim)',
                       margin: 0
                     }}>
-                      {isSpeaking && spokenCharIndex > 0 ? (
+                      {activeMedia === 'vr' ? (
+                        locationData.summary
+                      ) : (
                         <>
                           <span style={{ color: 'var(--text)', transition: 'color 0.2s' }}>
                             {locationData.summary.substring(0, spokenCharIndex)}
                           </span>
-                          <span>
+                          <span style={{ opacity: 0 }}>
                             {locationData.summary.substring(spokenCharIndex)}
                           </span>
                         </>
-                      ) : (
-                        locationData.summary
                       )}
                     </p>
-                    
-                    {/* Info Grid for Premium Feel */}
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginTop: '40px' }}>
-                      <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: '14px', padding: '15px' }}>
-                        <span style={{ fontSize: '11px', color: 'var(--text-faint)', display: 'block', marginBottom: '6px' }}>Built / Established</span>
-                        <strong style={{ fontSize: '15px', fontWeight: '500', color: 'var(--text)' }}>
-                          {locationData.name.toLowerCase().includes('taj') ? '1631–1653' : 'Historical Era'}
-                        </strong>
-                      </div>
-                      <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: '14px', padding: '15px' }}>
-                        <span style={{ fontSize: '11px', color: 'var(--text-faint)', display: 'block', marginBottom: '6px' }}>Best time</span>
-                        <strong style={{ fontSize: '15px', fontWeight: '500', color: 'var(--text)' }}>
-                          {locationData.name.toLowerCase().includes('taj') ? 'Oct – Mar' : 'Spring / Fall'}
-                        </strong>
-                      </div>
-                      <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: '14px', padding: '15px' }}>
-                        <span style={{ fontSize: '11px', color: 'var(--text-faint)', display: 'block', marginBottom: '6px' }}>Rating</span>
-                        <strong style={{ fontSize: '15px', fontWeight: '500', color: 'var(--text)' }}>4.8 ★</strong>
-                      </div>
-                      <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: '14px', padding: '15px' }}>
-                        <span style={{ fontSize: '11px', color: 'var(--text-faint)', display: 'block', marginBottom: '6px' }}>Entry fee</span>
-                        <strong style={{ fontSize: '15px', fontWeight: '500', color: 'var(--text)' }}>
-                          {locationData.name.toLowerCase().includes('taj') ? '₹50 / ₹1100' : 'Varies'}
-                        </strong>
-                      </div>
-                    </div>
                   </div>
                 )}
               </div>
