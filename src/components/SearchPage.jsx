@@ -706,30 +706,7 @@ export default function SearchPage() {
                   </div>
                 </div>
 
-                {/* Ref added for auto-scrolling */}
-                {activeMedia !== null && (
-                  <div ref={textContainerRef} style={{ flex: 1, overflowY: 'auto', paddingRight: '20px', scrollBehavior: 'smooth' }}>
-                    <p style={{ 
-                      fontSize: '1.25rem', 
-                      lineHeight: '1.8', 
-                      color: 'var(--text-dim)',
-                      margin: 0
-                    }}>
-                      {activeMedia === 'vr' ? (
-                        locationData.summary
-                      ) : (
-                        <>
-                          <span style={{ color: 'var(--text)', transition: 'color 0.2s' }}>
-                            {locationData.summary.substring(0, spokenCharIndex)}
-                          </span>
-                          <span style={{ opacity: 0 }}>
-                            {locationData.summary.substring(spokenCharIndex)}
-                          </span>
-                        </>
-                      )}
-                    </p>
-                  </div>
-                )}
+                {/* Text and content block completely removed as per requirement */}
               </div>
           </div>
         )}
