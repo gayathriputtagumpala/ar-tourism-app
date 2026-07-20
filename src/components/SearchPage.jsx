@@ -502,7 +502,7 @@ export default function SearchPage() {
                     <iframe 
                       width="100%" 
                       height="100%" 
-                      src={`https://www.youtube.com/embed/${locationData.vrYoutubeId}?autoplay=1&mute=1&loop=1&playlist=${locationData.vrYoutubeId}&controls=1&modestbranding=1&rel=0`} 
+                      src={`https://www.youtube.com/embed/${locationData.vrYoutubeId}?autoplay=1&mute=1&loop=1&playlist=${locationData.vrYoutubeId}&controls=0&modestbranding=1&rel=0`} 
                       title="YouTube VR video player" 
                       frameBorder="0" 
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
@@ -748,6 +748,7 @@ export default function SearchPage() {
           </div>
         )}
 
+        <audio ref={audioRef} src="https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg" loop style={{ display: 'none' }} />
       </div>
 
       <style dangerouslySetInnerHTML={{__html: `
