@@ -155,14 +155,15 @@ export default function SearchPage() {
     
     const translate = async () => {
       try {
-        const textToTranslate = locationData.name + "|||" + locationData.summary;
-        const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLangCode}&dt=t&q=${encodeURIComponent(textToTranslate)}`);
-        const data = await res.json();
+        const [resName, resSummary] = await Promise.all([
+          fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLangCode}&dt=t&q=${encodeURIComponent(locationData.name)}`),
+          fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLangCode}&dt=t&q=${encodeURIComponent(locationData.summary)}`)
+        ]);
+        const dataName = await resName.json();
+        const dataSummary = await resSummary.json();
         
-        const translatedText = data[0].map(x => x[0]).join('');
-        const parts = translatedText.split('|||');
-        const translatedName = parts[0].trim();
-        const translatedSummary = parts.slice(1).join('|||').trim();
+        const translatedName = dataName[0].map(x => x[0]).join('').trim();
+        const translatedSummary = dataSummary[0].map(x => x[0]).join('').trim();
         
         const newTranslatedData = {
           name: translatedName || locationData.name,
