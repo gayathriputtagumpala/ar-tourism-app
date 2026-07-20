@@ -229,8 +229,11 @@ export default function SearchPage() {
           
           const chunkText = chunks[currentChunkIdx];
           const url = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=${langCode}&q=${encodeURIComponent(chunkText)}`;
-          const audio = new Audio(url);
-          cloudAudioRef.current = audio;
+          
+          if (!cloudAudioRef.current) return;
+          const audio = cloudAudioRef.current;
+          audio.src = url;
+          audio.playbackRate = 0.95;
           
           let animationFrame;
           const startSync = () => {
@@ -758,7 +761,10 @@ export default function SearchPage() {
                   <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
                     <select 
                       value={speechLang}
-                      onChange={(e) => setSpeechLang(e.target.value)}
+                      onChange={(e) => {
+                        if (cloudAudioRef.current) cloudAudioRef.current.play().catch(()=>{});
+                        setSpeechLang(e.target.value);
+                      }}
                       style={{
                         background: 'rgba(255, 255, 255, 0.1)',
                         border: '1px solid rgba(255,255,255,0.2)',
@@ -827,19 +833,28 @@ export default function SearchPage() {
                 {activeMedia === null && (
                   <div style={{ display: 'flex', gap: '10px', marginBottom: '22px' }}>
                     <div 
-                      onClick={() => setActiveMedia('image')}
+                      onClick={() => {
+                        if (cloudAudioRef.current) cloudAudioRef.current.play().catch(()=>{});
+                        setActiveMedia('image');
+                      }}
                       style={{ flex: 1, padding: '13px', borderRadius: '14px', textAlign: 'center', fontSize: '13px', fontWeight: '500', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', cursor: 'pointer', background: 'var(--surface)', border: '1px solid var(--line)', color: 'var(--text)', transition: 'all 0.2s' }}
                     >
                       🖼️<span>View Image</span><small style={{ fontSize: '10px', opacity: 0.75, fontWeight: 400 }}>High Quality</small>
                     </div>
                     <div 
-                      onClick={() => setActiveMedia('video')}
+                      onClick={() => {
+                        if (cloudAudioRef.current) cloudAudioRef.current.play().catch(()=>{});
+                        setActiveMedia('video');
+                      }}
                       style={{ flex: 1, padding: '13px', borderRadius: '14px', textAlign: 'center', fontSize: '13px', fontWeight: '500', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', cursor: 'pointer', background: 'var(--surface)', border: '1px solid var(--line)', color: 'var(--text)', transition: 'all 0.2s' }}
                     >
                       ▶<span>Watch video</span><small style={{ fontSize: '10px', opacity: 0.75, fontWeight: 400 }}>Cinematic</small>
                     </div>
                     <div 
-                      onClick={() => setActiveMedia('vr')}
+                      onClick={() => {
+                        if (cloudAudioRef.current) cloudAudioRef.current.play().catch(()=>{});
+                        setActiveMedia('vr');
+                      }}
                       style={{ flex: 1, padding: '13px', borderRadius: '14px', textAlign: 'center', fontSize: '13px', fontWeight: '500', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', cursor: 'pointer', background: 'linear-gradient(135deg, var(--cyan), #2fb8b0)', color: '#fff', position: 'relative', overflow: 'hidden' }}
                     >
                       <div style={{ position: 'absolute', width: '70px', height: '70px', border: '1px solid rgba(255,255,255,0.35)', borderRadius: '50%', top: '-20px', right: '-20px' }}></div>
@@ -889,6 +904,7 @@ export default function SearchPage() {
         )}
 
         <audio ref={audioRef} src="https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg" loop style={{ display: 'none' }} />
+        <audio ref={cloudAudioRef} style={{ display: 'none' }} />
       </div>
 
       <style dangerouslySetInnerHTML={{__html: `
