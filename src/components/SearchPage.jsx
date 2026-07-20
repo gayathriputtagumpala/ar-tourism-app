@@ -904,7 +904,7 @@ export default function SearchPage() {
         )}
 
         <audio ref={audioRef} src="https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg" loop style={{ display: 'none' }} />
-        <audio ref={cloudAudioRef} style={{ display: 'none' }} />
+        <audio ref={cloudAudioRef} referrerPolicy="no-referrer" style={{ display: 'none' }} />
       </div>
 
       <style dangerouslySetInnerHTML={{__html: `
