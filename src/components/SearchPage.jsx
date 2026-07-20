@@ -563,7 +563,7 @@ export default function SearchPage() {
                   onError={() => setVideoFailed(true)}
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                 />
-              ) : (activeMedia === 'image' || activeMedia === null) && locationData.imageUrl ? (
+              ) : activeMedia === 'image' && locationData.imageUrl ? (
                 <img 
                   src={locationData.imageUrl} 
                   alt={locationData.name} 
@@ -573,6 +573,8 @@ export default function SearchPage() {
                     objectFit: 'cover'
                   }} 
                 />
+              ) : activeMedia === null ? (
+                <div style={{ width: '100%', height: '100%', background: 'transparent' }} />
               ) : (
                 <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', color: 'rgba(255,255,255,0.3)' }}>
                   <ImageIcon size={48} />
