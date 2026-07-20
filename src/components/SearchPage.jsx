@@ -563,7 +563,7 @@ export default function SearchPage() {
                   onError={() => setVideoFailed(true)}
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                 />
-              ) : activeMedia === 'image' && locationData.imageUrl ? (
+              ) : (activeMedia === 'image' || activeMedia === null) && locationData.imageUrl ? (
                 <img 
                   src={locationData.imageUrl} 
                   alt={locationData.name} 
@@ -573,15 +573,6 @@ export default function SearchPage() {
                     objectFit: 'cover'
                   }} 
                 />
-              ) : activeMedia === null ? (
-                <div style={{ textAlign: 'center', padding: '40px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', color: 'var(--text-dim)' }}>
-                  <div style={{ marginBottom: '20px', display: 'flex', gap: '20px' }}>
-                    <ImageIcon size={48} color="rgba(255,255,255,0.2)" />
-                    <Play size={48} color="rgba(255,255,255,0.2)" />
-                  </div>
-                  <h3 style={{ fontSize: '1.8rem', fontFamily: "'Space Grotesk', sans-serif", color: 'var(--text)', marginBottom: '10px' }}>Select Media Type</h3>
-                  <p style={{ fontSize: '1.1rem', maxWidth: '300px' }}>Choose View Image, Watch Video, or Enter VR from the right panel to explore this destination.</p>
-                </div>
               ) : (
                 <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', color: 'rgba(255,255,255,0.3)' }}>
                   <ImageIcon size={48} />
