@@ -22,6 +22,11 @@ export default function SearchPage() {
   const [spokenCharIndex, setSpokenCharIndex] = useState(0);
   const [speechLang, setSpeechLang] = useState('en-IN');
   const [translatedData, setTranslatedData] = useState(null);
+  const locationNameRef = useRef(null);
+
+  useEffect(() => {
+    locationNameRef.current = locationData ? locationData.name : null;
+  }, [locationData]);
 
   const TRENDING_PLACES = [
     // --- MONUMENTS ---
@@ -201,13 +206,14 @@ export default function SearchPage() {
         };
         
         setTranslatedData(newTranslatedData);
-        if (isSpeakingRef.current) {
+        // Only speak if we are still on the same location (prevent race condition when returning to dashboard)
+        if (isSpeakingRef.current && locationNameRef.current === locationData.name) {
           speakSummary(newTranslatedData.summary);
         }
       } catch (err) {
         console.error("Translation failed:", err);
         setTranslatedData(null);
-        if (isSpeakingRef.current) {
+        if (isSpeakingRef.current && locationNameRef.current === locationData.name) {
           speakSummary(locationData.summary);
         }
       }
@@ -323,10 +329,8 @@ export default function SearchPage() {
              const ratio = Math.min(1, audio.currentTime / duration);
              const chars = cumulativeChars + Math.floor(ratio * chunkText.length);
              setSpokenCharIndex(chars || 0);
-             if (textContainerRef.current) {
-               const scrollRatio = (chars || 0) / text.length;
-               textContainerRef.current.scrollTop = (textContainerRef.current.scrollHeight - textContainerRef.current.clientHeight) * scrollRatio;
-             }
+             setSpokenCharIndex(chars || 0);
+             // Removed forced scrolling so user can freely scroll the text container
           }
           if (isSpeakingRef.current && currentChunkIdx < chunks.length) {
              animationFrame = requestAnimationFrame(sync);
