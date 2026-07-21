@@ -451,6 +451,10 @@ export default function SearchPage() {
       } catch (ytError) {
         console.error("YouTube API fetch failed:", ytError);
       }
+      if (!youtubeId) {
+        // Fallback to a generic beautiful cinematic Earth video if quota is exceeded
+        youtubeId = "X-7lB20v7p4"; 
+      }
 
       // Dynamically fetch VR 360 video from YouTube API!
       let vrYoutubeId = null;
@@ -465,6 +469,10 @@ export default function SearchPage() {
       } catch (vrError) {
         console.error("YouTube VR API fetch failed:", vrError);
       }
+      if (!vrYoutubeId) {
+        // Fallback generic VR 360 video if quota exceeded
+        vrYoutubeId = "vEwFCAvB3o8";
+      }
 
       const newData = {
         name: title,
@@ -474,9 +482,16 @@ export default function SearchPage() {
         youtubeId: youtubeId,
         vrYoutubeId: vrYoutubeId
       };
+      // Mark as speaking so the useEffect triggers audio translation and playback
+      isSpeakingRef.current = true;
       setLocationData(newData);
       setVideoFailed(false);
-      setActiveMedia(null);
+      // Auto-open image if video fails to fetch properly, otherwise show CTA
+      if (youtubeId === "X-7lB20v7p4" && imageUrl) {
+        setActiveMedia('image');
+      } else {
+        setActiveMedia(null);
+      }
       
     } catch (error) {
       console.error("Search failed:", error);
