@@ -95,6 +95,16 @@ export default function SearchPage() {
   const cloudAudioRef = useRef(null);
 
   useEffect(() => {
+    if (!locationData) {
+      if (audioRef.current) audioRef.current.pause();
+      if (cloudAudioRef.current) cloudAudioRef.current.pause();
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+      isSpeakingRef.current = false;
+      setSpokenCharIndex(0);
+      return;
+    }
+    
     if (activeMedia === 'vr') {
       if (cloudAudioRef.current) {
         cloudAudioRef.current.pause();
