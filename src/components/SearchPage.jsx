@@ -199,25 +199,21 @@ export default function SearchPage() {
     
     // Stop any current audio
     window.speechSynthesis.cancel();
-    if (cloudAudioRef.current) {
-      cloudAudioRef.current.pause();
-    }
     setSpokenCharIndex(0);
     
-    setTimeout(() => {
-      if (!speechLang.startsWith('en')) {
-        // Use Google Cloud TTS via audio tag for regional Indian languages
-        const langCode = speechLang.split('-')[0];
-        const sentences = text.match(/[^.!?।\n]+[.!?।\n]+/g) || [text];
-        let chunks = [];
-        let curr = "";
-        sentences.forEach(s => {
-          if (curr.length + s.length > 480) {
-             if (curr) chunks.push(curr);
-             curr = s;
-          } else {
-             curr += s;
-          }
+    if (!speechLang.startsWith('en')) {
+      // Use Cloud TTS via audio tag for regional Indian languages
+      const langCode = speechLang.split('-')[0];
+      const sentences = text.match(/[^.!?।\n]+[.!?।\n]+/g) || [text];
+      let chunks = [];
+      let curr = "";
+      sentences.forEach(s => {
+        if (curr.length + s.length > 480) {
+           if (curr) chunks.push(curr);
+           curr = s;
+        } else {
+           curr += s;
+        }
         });
         if (curr) chunks.push(curr);
         
@@ -362,11 +358,14 @@ export default function SearchPage() {
   
         window.speechSynthesis.speak(utterance);
       }
-    }, 50);
   };
   
   const toggleSpeech = () => {
-    if (cloudAudioRef.current) cloudAudioRef.current.play().catch(()=>{});
+    if (cloudAudioRef.current && !isSpeaking) {
+      cloudAudioRef.current.src = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA";
+      cloudAudioRef.current.play().catch(()=>{});
+    }
+
     if (isSpeaking) {
       window.speechSynthesis.cancel();
       if (cloudAudioRef.current) {
@@ -795,7 +794,10 @@ export default function SearchPage() {
                     <select 
                       value={speechLang}
                       onChange={(e) => {
-                        if (cloudAudioRef.current) cloudAudioRef.current.play().catch(()=>{});
+                        if (cloudAudioRef.current) {
+                          cloudAudioRef.current.src = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA";
+                          cloudAudioRef.current.play().catch(()=>{});
+                        }
                         setSpeechLang(e.target.value);
                       }}
                       style={{
