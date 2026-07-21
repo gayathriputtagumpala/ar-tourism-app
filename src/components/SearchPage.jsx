@@ -366,6 +366,7 @@ export default function SearchPage() {
   };
   
   const toggleSpeech = () => {
+    if (cloudAudioRef.current) cloudAudioRef.current.play().catch(()=>{});
     if (isSpeaking) {
       window.speechSynthesis.cancel();
       if (cloudAudioRef.current) {
