@@ -209,163 +209,116 @@ export default function SearchPage() {
     window.speechSynthesis.cancel();
     setSpokenCharIndex(0);
     
-    if (!speechLang.startsWith('en')) {
-      // Use Cloud TTS via audio tag for regional Indian languages
-      const langCode = speechLang.split('-')[0];
-      const sentences = text.match(/[^.!?।\n]+[.!?।\n]+/g) || [text];
-      let chunks = [];
-      let curr = "";
-      sentences.forEach(s => {
-        if (curr.length + s.length > 480) {
-           if (curr) chunks.push(curr);
-           curr = s;
-        } else {
-           curr += s;
-        }
-        });
-        if (curr) chunks.push(curr);
-        
-        let currentChunkIdx = 0;
-        let cumulativeChars = 0;
-        
-        setIsSpeaking(true);
-        isSpeakingRef.current = true;
-        
-        const playNextChunk = async () => {
-          if (!isSpeakingRef.current || currentChunkIdx >= chunks.length) {
-            setIsSpeaking(false);
-            isSpeakingRef.current = false;
-            setSpokenCharIndex(text.length); 
-            return;
-          }
-          
-          const chunkText = chunks[currentChunkIdx];
-          
-          if (!cloudAudioRef.current) return;
-          const audio = cloudAudioRef.current;
-
-          try {
-            const response = await fetch("https://api.sarvam.ai/text-to-speech", {
-              method: "POST",
-              headers: {
-                "api-subscription-key": "sk_b2ux1s0k_y2gISHPuLQVikDg7vpnRVbaZ",
-                "Content-Type": "application/json"
-              },
-              body: JSON.stringify({
-                inputs: [chunkText],
-                target_language_code: speechLang,
-                speaker: "priya",
-                pace: 1.0,
-                speech_sample_rate: 8000,
-                enable_preprocessing: true,
-                model: "bulbul:v3"
-              })
-            });
-
-            if (!response.ok) throw new Error("Sarvam API error");
-            const data = await response.json();
-            audio.src = `data:audio/wav;base64,${data.audios[0]}`;
-          } catch (e) {
-            console.error("Sarvam TTS failed, falling back to Google:", e);
-            const langCode = speechLang.split('-')[0];
-            audio.src = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=${langCode}&q=${encodeURIComponent(chunkText)}`;
-          }
-          
-          audio.playbackRate = 0.95;
-          
-          let animationFrame;
-          const startSync = () => {
-            const sync = () => {
-              if (audio.duration && !audio.paused) {
-                 const ratio = audio.currentTime / audio.duration;
-                 const chars = cumulativeChars + Math.floor(ratio * chunkText.length);
-                 setSpokenCharIndex(chars);
-                 if (textContainerRef.current) {
-                   const scrollRatio = chars / text.length;
-                   textContainerRef.current.scrollTop = (textContainerRef.current.scrollHeight - textContainerRef.current.clientHeight) * scrollRatio;
-                 }
-              }
-              if (isSpeakingRef.current && currentChunkIdx < chunks.length) {
-                 animationFrame = requestAnimationFrame(sync);
-              }
-            };
-            sync();
-          };
-          
-          audio.onplay = () => {
-            startSync();
-          };
-          
-          audio.onended = () => {
-             cancelAnimationFrame(animationFrame);
-             cumulativeChars += chunkText.length;
-             currentChunkIdx++;
-             playNextChunk();
-          };
-          
-          audio.onerror = () => {
-             cancelAnimationFrame(animationFrame);
-             cumulativeChars += chunkText.length;
-             currentChunkIdx++;
-             playNextChunk();
-          };
-          
-          audio.play().catch(e => {
-            console.error("Audio playback blocked", e);
-            cancelAnimationFrame(animationFrame);
-            cumulativeChars += chunkText.length;
-            currentChunkIdx++;
-            playNextChunk();
-          });
-        };
-        
-        playNextChunk();
-        
+    // Use Cloud TTS via audio tag for all languages including English
+    const langCode = speechLang.split('-')[0];
+    const sentences = text.match(/[^.!?।\n]+[.!?।\n]+/g) || [text];
+    let chunks = [];
+    let curr = "";
+    sentences.forEach(s => {
+      if (curr.length + s.length > 480) {
+         if (curr) chunks.push(curr);
+         curr = s;
       } else {
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = speechLang;
-        
-        const availableVoices = window.speechSynthesis.getVoices();
-        const selectedVoice = availableVoices.find(v => v.lang === speechLang) 
-                          || availableVoices.find(v => v.lang.includes(speechLang.split('-')[0]));
-        
-        if (selectedVoice) {
-          utterance.voice = selectedVoice;
-        }
-        
-        utterance.rate = 0.95;
-        utterance.pitch = 1;
-        
-        utterance.onstart = () => {
-          setIsSpeaking(true);
-          isSpeakingRef.current = true;
-        };
-  
-        utterance.onend = () => {
-          setIsSpeaking(false);
-          isSpeakingRef.current = false;
-          setSpokenCharIndex(0);
-        };
-  
-        utterance.onerror = (e) => {
-          console.error("Speech error:", e);
-          setIsSpeaking(false);
-          isSpeakingRef.current = false;
-          setSpokenCharIndex(0);
-        };
-  
-        utterance.onboundary = (e) => {
-          if (e.name === 'word') {
-            setSpokenCharIndex(e.charIndex);
-            if (textContainerRef.current) {
-              const ratio = e.charIndex / text.length;
-              textContainerRef.current.scrollTop = (textContainerRef.current.scrollHeight - textContainerRef.current.clientHeight) * ratio;
-            }
+         curr += s;
+      }
+    });
+    if (curr) chunks.push(curr);
+    
+    let currentChunkIdx = 0;
+    let cumulativeChars = 0;
+    
+    setIsSpeaking(true);
+    isSpeakingRef.current = true;
+    
+    const playNextChunk = async () => {
+      if (!isSpeakingRef.current || currentChunkIdx >= chunks.length) {
+        setIsSpeaking(false);
+        isSpeakingRef.current = false;
+        setSpokenCharIndex(text.length); 
+        return;
+      }
+      
+      const chunkText = chunks[currentChunkIdx];
+      
+      if (!cloudAudioRef.current) return;
+      const audio = cloudAudioRef.current;
+
+      try {
+        const response = await fetch("https://api.sarvam.ai/text-to-speech", {
+          method: "POST",
+          headers: {
+            "api-subscription-key": "sk_b2ux1s0k_y2gISHPuLQVikDg7vpnRVbaZ",
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            inputs: [chunkText],
+            target_language_code: speechLang,
+            speaker: "priya",
+            pace: 1.0,
+            speech_sample_rate: 8000,
+            enable_preprocessing: true,
+            model: "bulbul:v3"
+          })
+        });
+
+        if (!response.ok) throw new Error("Sarvam API error");
+        const data = await response.json();
+        audio.src = `data:audio/wav;base64,${data.audios[0]}`;
+      } catch (e) {
+        console.error("Sarvam TTS failed, falling back to Google:", e);
+        const fbLang = speechLang.split('-')[0];
+        audio.src = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=${fbLang}&q=${encodeURIComponent(chunkText)}`;
+      }
+      
+      audio.playbackRate = 0.95;
+      
+      let animationFrame;
+      const startSync = () => {
+        const sync = () => {
+          if (audio.duration && !audio.paused) {
+             const ratio = audio.currentTime / audio.duration;
+             const chars = cumulativeChars + Math.floor(ratio * chunkText.length);
+             setSpokenCharIndex(chars);
+             if (textContainerRef.current) {
+               const scrollRatio = chars / text.length;
+               textContainerRef.current.scrollTop = (textContainerRef.current.scrollHeight - textContainerRef.current.clientHeight) * scrollRatio;
+             }
+          }
+          if (isSpeakingRef.current && currentChunkIdx < chunks.length) {
+             animationFrame = requestAnimationFrame(sync);
           }
         };
-  
-        window.speechSynthesis.speak(utterance);
-      }
+        sync();
+      };
+      
+      audio.onplay = () => {
+        startSync();
+      };
+      
+      audio.onended = () => {
+         cancelAnimationFrame(animationFrame);
+         cumulativeChars += chunkText.length;
+         currentChunkIdx++;
+         playNextChunk();
+      };
+      
+      audio.onerror = () => {
+         cancelAnimationFrame(animationFrame);
+         cumulativeChars += chunkText.length;
+         currentChunkIdx++;
+         playNextChunk();
+      };
+      
+      audio.play().catch(e => {
+        console.error("Audio playback blocked", e);
+        cancelAnimationFrame(animationFrame);
+        cumulativeChars += chunkText.length;
+        currentChunkIdx++;
+        playNextChunk();
+      });
+    };
+    
+    playNextChunk();
   };
   
   const toggleSpeech = () => {
