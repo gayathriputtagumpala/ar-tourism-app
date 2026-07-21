@@ -101,7 +101,7 @@ export default function SearchPage() {
       isSpeakingRef.current = false;
       setSpokenCharIndex(0);
       if (audioRef.current) {
-        audioRef.current.volume = 0.4;
+        audioRef.current.volume = 0.6;
         audioRef.current.play().catch(e => console.log("Audio play failed:", e));
       }
     } else if (activeMedia === 'image' || activeMedia === 'video') {
@@ -664,7 +664,7 @@ export default function SearchPage() {
                     <iframe 
                       width="100%" 
                       height="100%" 
-                      src={`https://www.youtube.com/embed/${locationData.vrYoutubeId}?autoplay=1&loop=1&playlist=${locationData.vrYoutubeId}&controls=1&modestbranding=1&rel=0&fs=1`} 
+                      src={`https://www.youtube.com/embed/${locationData.vrYoutubeId}?autoplay=1&mute=1&loop=1&playlist=${locationData.vrYoutubeId}&controls=1&modestbranding=1&rel=0&fs=1`} 
                       title="YouTube VR video player" 
                       frameBorder="0" 
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; xr-spatial-tracking" 
@@ -925,7 +925,7 @@ export default function SearchPage() {
           </div>
         )}
 
-        <audio ref={audioRef} src="https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg" loop style={{ display: 'none' }} />
+        <audio ref={audioRef} src="https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3" loop style={{ display: 'none' }} />
         <audio ref={cloudAudioRef} referrerPolicy="no-referrer" style={{ display: 'none' }} />
       </div>
 
