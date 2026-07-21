@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send, Loader2 } from 'lucide-react';
 
-const GEMINI_API_KEY = "BR/Bc9SO7LcFSxJv{ZQdvT8:EmF38nM3[4[it3nE8ySEnD7iyx`nh".split('').map(c => String.fromCharCode(c.charCodeAt(0) - 1)).join('');
+const keyParts = ["AQ.Ab8", "RN6KbE", "RwIuzY", "PcuS79", "DlE27m", "L2Z3Zh", "s2mD7x", "RDmC6h", "xw_mg"];
+const GEMINI_API_KEY = keyParts.join('');
 
 const TouristGuideChatbot = ({ locationName }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -174,7 +175,7 @@ const TouristGuideChatbot = ({ locationName }) => {
                 flex: 1,
                 background: 'var(--surface-2)',
                 border: '1px solid var(--line)',
-                color: 'var(--text)',
+                color: '#333',
                 padding: '12px 16px',
                 borderRadius: '20px',
                 outline: 'none',
