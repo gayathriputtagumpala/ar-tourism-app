@@ -230,21 +230,9 @@ export default function SearchPage() {
     setIsSpeaking(true);
     isSpeakingRef.current = true;
     
-    const playNextChunk = async () => {
-      if (!isSpeakingRef.current || currentChunkIdx >= chunks.length) {
-        setIsSpeaking(false);
-        isSpeakingRef.current = false;
-        setSpokenCharIndex(text.length); 
-        return;
-      }
-      
-      const chunkText = chunks[currentChunkIdx];
-      
-      if (!cloudAudioRef.current) return;
-      const audio = cloudAudioRef.current;
-
-      try {
-        const response = await fetch("https://api.sarvam.ai/text-to-speech", {
+    (async () => {
+      const fetchPromises = chunks.map(chunkText => 
+        fetch("https://api.sarvam.ai/text-to-speech", {
           method: "POST",
           headers: {
             "api-subscription-key": "sk_b2ux1s0k_y2gISHPuLQVikDg7vpnRVbaZ",
@@ -259,20 +247,35 @@ export default function SearchPage() {
             enable_preprocessing: true,
             model: "bulbul:v3"
           })
-        });
+        }).then(async res => {
+          if (!res.ok) throw new Error("Sarvam API error");
+          const data = await res.json();
+          return `data:audio/wav;base64,${data.audios[0]}`;
+        }).catch(e => {
+          console.error("Sarvam TTS failed, falling back to Google:", e);
+          const fbLang = speechLang.split('-')[0];
+          return `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=${fbLang}&q=${encodeURIComponent(chunkText)}`;
+        })
+      );
+      
+      const audioSources = await Promise.all(fetchPromises);
+      
+      const playNextChunk = async () => {
+        if (!isSpeakingRef.current || currentChunkIdx >= chunks.length) {
+          setIsSpeaking(false);
+          isSpeakingRef.current = false;
+          setSpokenCharIndex(text.length); 
+          return;
+        }
+        
+        const chunkText = chunks[currentChunkIdx];
+        
+        if (!cloudAudioRef.current) return;
+        const audio = cloudAudioRef.current;
 
-        if (!response.ok) throw new Error("Sarvam API error");
-        const data = await response.json();
-        audio.src = `data:audio/wav;base64,${data.audios[0]}`;
-      } catch (e) {
-        console.error("Sarvam TTS failed, falling back to Google:", e);
-        const fbLang = speechLang.split('-')[0];
-        audio.src = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=${fbLang}&q=${encodeURIComponent(chunkText)}`;
-      }
-      
-      audio.playbackRate = 0.95;
-      
-      let animationFrame;
+        audio.src = audioSources[currentChunkIdx];
+        audio.playbackRate = 0.95;
+        let animationFrame;
       const startSync = () => {
         const sync = () => {
           if (audio.duration && !audio.paused) {
@@ -319,6 +322,7 @@ export default function SearchPage() {
     };
     
     playNextChunk();
+    })();
   };
   
   const toggleSpeech = () => {
@@ -359,7 +363,7 @@ export default function SearchPage() {
         
         if (searchData.query && searchData.query.search && searchData.query.search.length > 0) {
           const correctTitle = searchData.query.search[0].title;
-          const response = await fetch(`https://en.wikipedia.org/w/api.php?action=query&prop=extracts|pageimages&exsentences=15&explaintext=true&piprop=original&titles=${encodeURIComponent(correctTitle)}&format=json&origin=*`);
+          const response = await fetch(`https://en.wikipedia.org/w/api.php?action=query&prop=extracts|pageimages&exchars=3500&explaintext=true&piprop=original&titles=${encodeURIComponent(correctTitle)}&format=json&origin=*`);
           
           if (response.ok) {
             const dataWrapper = await response.json();
@@ -872,7 +876,7 @@ export default function SearchPage() {
                     >
                       ← Change Media
                     </button>
-                    <div ref={textContainerRef} style={{ flex: 1, overflowY: 'auto', paddingRight: '20px', scrollBehavior: 'smooth' }}>
+                    <div ref={textContainerRef} style={{ flex: 1, overflowY: 'auto', paddingRight: '20px' }}>
                       <p style={{ 
                         fontSize: '1.25rem', 
                         lineHeight: '1.8', 
