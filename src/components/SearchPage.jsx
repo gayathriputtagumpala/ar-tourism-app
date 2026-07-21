@@ -431,22 +431,11 @@ export default function SearchPage() {
       // Dynamically fetch VR 360 video from YouTube API!
       let vrYoutubeId = null;
       try {
-        const vrResponse = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(normalizedSearch + ' "360" VR 8K -vlog -fake')}&type=video&videoDefinition=high&maxResults=1&key=AIzaSyAql1uryXvB8TTeBg63O-2JoXes20KE-T8`);
+        const vrResponse = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(normalizedSearch + ' 360 VR tour immersive')}&type=video&videoDefinition=high&maxResults=1&key=AIzaSyAql1uryXvB8TTeBg63O-2JoXes20KE-T8`);
         if (vrResponse.ok) {
           const vrData = await vrResponse.json();
           if (vrData.items && vrData.items.length > 0) {
             vrYoutubeId = vrData.items[0].id.videoId;
-          }
-        }
-        
-        // Fallback for local places if strict search yields no results
-        if (!vrYoutubeId) {
-          const relaxedRes = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(normalizedSearch + ' 360 tour')}&type=video&maxResults=1&key=AIzaSyAql1uryXvB8TTeBg63O-2JoXes20KE-T8`);
-          if (relaxedRes.ok) {
-            const relaxedData = await relaxedRes.json();
-            if (relaxedData.items && relaxedData.items.length > 0) {
-              vrYoutubeId = relaxedData.items[0].id.videoId;
-            }
           }
         }
       } catch (vrError) {
