@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Canvas } from '@react-three/fiber';
 import { Environment, Stars } from '@react-three/drei';
 import { Search, MapPin, Volume2, VolumeX, Image as ImageIcon, Camera, Play, Pause, Heart } from 'lucide-react';
+import TouristGuideChatbot from './TouristGuideChatbot';
 
 export default function SearchPage() {
   const navigate = useNavigate();
@@ -252,34 +253,38 @@ export default function SearchPage() {
     isSpeakingRef.current = true;
     
     (async () => {
-      const fetchPromises = chunks.map(chunkText => 
-        fetch("https://api.sarvam.ai/text-to-speech", {
-          method: "POST",
-          headers: {
-            "api-subscription-key": "sk_b2ux1s0k_y2gISHPuLQVikDg7vpnRVbaZ",
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            inputs: [chunkText],
-            target_language_code: speechLang,
-            speaker: "priya",
-            pace: 1.0,
-            speech_sample_rate: 8000,
-            enable_preprocessing: true,
-            model: "bulbul:v3"
-          })
-        }).then(async res => {
-          if (!res.ok) throw new Error("Sarvam API error");
+      const audioSources = new Array(chunks.length);
+      const fetchChunk = async (idx) => {
+        if (idx >= chunks.length || audioSources[idx]) return audioSources[idx];
+        const chunkText = chunks[idx];
+        try {
+          const res = await fetch("https://api.sarvam.ai/text-to-speech", {
+            method: "POST",
+            headers: {
+              "api-subscription-key": "sk_b2ux1s0k_y2gISHPuLQVikDg7vpnRVbaZ",
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              inputs: [chunkText],
+              target_language_code: speechLang,
+              speaker: "priya",
+              pace: 1.0,
+              speech_sample_rate: 8000,
+              enable_preprocessing: true,
+              model: "bulbul:v3"
+            })
+          });
+          if (!res.ok) throw new Error("Sarvam error");
           const data = await res.json();
-          return `data:audio/wav;base64,${data.audios[0]}`;
-        }).catch(e => {
-          console.error("Sarvam TTS failed, falling back to Google:", e);
-          const fbLang = speechLang.split('-')[0];
-          return `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=${fbLang}&q=${encodeURIComponent(chunkText)}`;
-        })
-      );
-      
-      const audioSources = await Promise.all(fetchPromises);
+          audioSources[idx] = `data:audio/wav;base64,${data.audios[0]}`;
+        } catch (e) {
+           console.error("Sarvam TTS failed for chunk " + idx + ", falling back to Google:", e);
+           const fbLang = speechLang.split('-')[0];
+           const safeText = chunkText.length > 200 ? chunkText.substring(0, 199) : chunkText;
+           audioSources[idx] = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=${fbLang}&q=${encodeURIComponent(safeText)}`;
+        }
+        return audioSources[idx];
+      };
       
       const playNextChunk = async () => {
         if (!isSpeakingRef.current || currentChunkIdx >= chunks.length) {
@@ -292,6 +297,17 @@ export default function SearchPage() {
         const chunkText = chunks[currentChunkIdx];
         
         if (!cloudAudioRef.current) return;
+        
+        // Ensure current chunk is fetched before playing
+        if (!audioSources[currentChunkIdx]) {
+           await fetchChunk(currentChunkIdx);
+        }
+        
+        // Prefetch next chunk in background
+        if (currentChunkIdx + 1 < chunks.length) {
+           fetchChunk(currentChunkIdx + 1);
+        }
+        
         const audio = cloudAudioRef.current;
 
         audio.src = audioSources[currentChunkIdx];
@@ -944,6 +960,7 @@ export default function SearchPage() {
 
         <audio ref={audioRef} src="https://cdn.pixabay.com/audio/2022/11/22/audio_febc508520.mp3" loop style={{ display: 'none' }} />
         <audio ref={cloudAudioRef} referrerPolicy="no-referrer" style={{ display: 'none' }} />
+        {locationData && <TouristGuideChatbot locationName={locationData.name} />}
       </div>
 
       <style dangerouslySetInnerHTML={{__html: `
