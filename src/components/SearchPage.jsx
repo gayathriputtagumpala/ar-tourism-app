@@ -790,7 +790,7 @@ export default function SearchPage() {
             )}
 
             {/* Content Section */}
-            <div style={{ padding: '40px 50px', flex: '1', display: 'flex', flexDirection: 'column', background: 'transparent' }}>
+            <div style={{ padding: '40px 50px', paddingTop: activeMedia === null ? '100px' : '40px', flex: '1', display: 'flex', flexDirection: 'column', background: 'transparent' }}>
                 {/* Back button removed as requested */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
                   <div>

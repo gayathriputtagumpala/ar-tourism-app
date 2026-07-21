@@ -77,10 +77,10 @@ const TouristGuideChatbot = ({ locationName }) => {
 
   return (
     <div style={{
-      position: 'fixed',
+      position: 'absolute',
       bottom: '30px',
       right: '30px',
-      zIndex: 100,
+      zIndex: 9999,
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'flex-end',
