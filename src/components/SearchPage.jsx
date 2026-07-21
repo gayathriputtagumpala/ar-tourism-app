@@ -299,12 +299,16 @@ export default function SearchPage() {
         let animationFrame;
       const startSync = () => {
         const sync = () => {
-          if (audio.duration && !audio.paused) {
-             const ratio = audio.currentTime / audio.duration;
+          if (!audio.paused) {
+             let duration = audio.duration;
+             if (!duration || !isFinite(duration)) {
+               duration = chunkText.length / 14; // approx 14 chars per second fallback
+             }
+             const ratio = Math.min(1, audio.currentTime / duration);
              const chars = cumulativeChars + Math.floor(ratio * chunkText.length);
-             setSpokenCharIndex(chars);
+             setSpokenCharIndex(chars || 0);
              if (textContainerRef.current) {
-               const scrollRatio = chars / text.length;
+               const scrollRatio = (chars || 0) / text.length;
                textContainerRef.current.scrollTop = (textContainerRef.current.scrollHeight - textContainerRef.current.clientHeight) * scrollRatio;
              }
           }
@@ -923,10 +927,10 @@ export default function SearchPage() {
                         ) : (
                           <>
                             <span style={{ color: 'var(--text)', transition: 'color 0.2s' }}>
-                              {(translatedData ? translatedData.summary : locationData.summary).substring(0, spokenCharIndex)}
+                              {(translatedData ? translatedData.summary : locationData.summary).substring(0, spokenCharIndex || 0)}
                             </span>
-                            <span style={{ opacity: 0 }}>
-                              {(translatedData ? translatedData.summary : locationData.summary).substring(spokenCharIndex)}
+                            <span style={{ opacity: 0.3 }}>
+                              {(translatedData ? translatedData.summary : locationData.summary).substring(spokenCharIndex || 0)}
                             </span>
                           </>
                         )}
