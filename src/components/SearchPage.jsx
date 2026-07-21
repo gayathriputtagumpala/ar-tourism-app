@@ -939,14 +939,14 @@ export default function SearchPage() {
                       <p style={{ 
                         fontSize: '1.25rem', 
                         lineHeight: '1.8', 
-                        color: 'var(--text-dim)',
+                        color: '#666',
                         margin: 0
                       }}>
                         {activeMedia === 'vr' ? (
                           (translatedData ? translatedData.summary : locationData.summary)
                         ) : (
                           <>
-                            <span style={{ color: 'var(--text)', transition: 'color 0.2s', fontWeight: '500' }}>
+                            <span style={{ color: '#000', transition: 'color 0.2s', fontWeight: '600' }}>
                               {(translatedData ? translatedData.summary : locationData.summary).substring(0, spokenCharIndex || 0)}
                             </span>
                             <span>
