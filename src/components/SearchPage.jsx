@@ -164,8 +164,16 @@ export default function SearchPage() {
     const translate = async () => {
       try {
         const [resName, resSummary] = await Promise.all([
-          fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLangCode}&dt=t&q=${encodeURIComponent(locationData.name)}`),
-          fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLangCode}&dt=t&q=${encodeURIComponent(locationData.summary)}`)
+          fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLangCode}&dt=t`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ q: locationData.name })
+          }),
+          fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLangCode}&dt=t`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ q: locationData.summary })
+          })
         ]);
         const dataName = await resName.json();
         const dataSummary = await resSummary.json();
@@ -398,7 +406,7 @@ export default function SearchPage() {
         
         if (searchData.query && searchData.query.search && searchData.query.search.length > 0) {
           const correctTitle = searchData.query.search[0].title;
-          const response = await fetch(`https://en.wikipedia.org/w/api.php?action=query&prop=extracts|pageimages&exsentences=5&explaintext=true&piprop=original&titles=${encodeURIComponent(correctTitle)}&format=json&origin=*`);
+          const response = await fetch(`https://en.wikipedia.org/w/api.php?action=query&prop=extracts|pageimages&exsentences=15&explaintext=true&piprop=original&titles=${encodeURIComponent(correctTitle)}&format=json&origin=*`);
           
           if (response.ok) {
             const dataWrapper = await response.json();
