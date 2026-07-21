@@ -212,7 +212,7 @@ export default function SearchPage() {
         let chunks = [];
         let curr = "";
         sentences.forEach(s => {
-          if (curr.length + s.length > 150) {
+          if (curr.length + s.length > 480) {
              if (curr) chunks.push(curr);
              curr = s;
           } else {
