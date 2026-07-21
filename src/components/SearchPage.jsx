@@ -211,18 +211,26 @@ export default function SearchPage() {
     
     // Use Cloud TTS via audio tag for all languages including English
     const langCode = speechLang.split('-')[0];
-    const sentences = text.match(/[^.!?।\n]+[.!?।\n]+/g) || [text];
+    const sentences = text.match(/[^.!?।\n]+[.!?।\n]*/g) || [text];
     let chunks = [];
     let curr = "";
     sentences.forEach(s => {
-      if (curr.length + s.length > 480) {
-         if (curr) chunks.push(curr);
-         curr = s;
+      s = s.trim();
+      if (!s) return;
+      if (s.length > 480) {
+        if (curr) chunks.push(curr);
+        for (let i = 0; i < s.length; i += 480) {
+          chunks.push(s.substring(i, i + 480));
+        }
+        curr = "";
+      } else if (curr.length + s.length > 480) {
+         chunks.push(curr);
+         curr = s + " ";
       } else {
-         curr += s;
+         curr += s + " ";
       }
     });
-    if (curr) chunks.push(curr);
+    if (curr.trim()) chunks.push(curr.trim());
     
     let currentChunkIdx = 0;
     let cumulativeChars = 0;
@@ -363,16 +371,30 @@ export default function SearchPage() {
         
         if (searchData.query && searchData.query.search && searchData.query.search.length > 0) {
           const correctTitle = searchData.query.search[0].title;
-          const response = await fetch(`https://en.wikipedia.org/w/api.php?action=query&prop=extracts|pageimages&exchars=3500&explaintext=true&piprop=original&titles=${encodeURIComponent(correctTitle)}&format=json&origin=*`);
+          const response = await fetch(`https://en.wikipedia.org/w/api.php?action=query&prop=extracts|pageimages&explaintext=true&piprop=original&titles=${encodeURIComponent(correctTitle)}&format=json&origin=*`);
           
           if (response.ok) {
             const dataWrapper = await response.json();
             const pages = dataWrapper.query.pages;
-            const data = Object.values(pages)[0];
+            const pageId = Object.keys(pages)[0];
+            const data = pages[pageId];
+            
             if (data && !data.missing) {
               title = data.title;
-              summary = data.extract ? data.extract.replace(/==.*?==/g, '').trim() : summary;
               imageUrl = data.original?.source || null;
+              
+              if (data.extract) {
+                let ext = data.extract;
+                // Remove sections like "== See also =="
+                ext = ext.split(/\n==\s/)[0];
+                // Slice to ~3000 chars for 2 minute length
+                if (ext.length > 3000) {
+                  let cut = ext.substring(0, 3000);
+                  ext = cut.substring(0, cut.lastIndexOf('.')) + '.';
+                }
+                // Clean text for Sarvam AI (remove brackets, parens, special chars)
+                summary = ext.replace(/[\[\]\(\)*_~"=]/g, '').replace(/\n+/g, ' ').trim();
+              }
             }
           }
         }
