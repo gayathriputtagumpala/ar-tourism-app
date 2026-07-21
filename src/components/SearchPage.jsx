@@ -13,6 +13,7 @@ export default function SearchPage() {
   const [videoFailed, setVideoFailed] = useState(false);
   const [activeMedia, setActiveMedia] = useState('video'); // 'image', 'video', 'vr'
   const [isVideoPlaying, setIsVideoPlaying] = useState(true);
+  const nativeVideoRef = useRef(null);
 
   const [activeCategory, setActiveCategory] = useState('All');
   const [savedPlaces, setSavedPlaces] = useState([]);
@@ -126,7 +127,14 @@ export default function SearchPage() {
 
   const toggleVideoPlay = (e) => {
     e.stopPropagation();
-    if (videoIframeRef.current && videoIframeRef.current.contentWindow) {
+    if (nativeVideoRef.current) {
+      if (isVideoPlaying) {
+        nativeVideoRef.current.pause();
+      } else {
+        nativeVideoRef.current.play();
+      }
+      setIsVideoPlaying(!isVideoPlaying);
+    } else if (videoIframeRef.current && videoIframeRef.current.contentWindow) {
       const action = isVideoPlaying ? 'pauseVideo' : 'playVideo';
       videoIframeRef.current.contentWindow.postMessage(`{"event":"command","func":"${action}","args":""}`, '*');
       setIsVideoPlaying(!isVideoPlaying);
@@ -219,7 +227,7 @@ export default function SearchPage() {
         setIsSpeaking(true);
         isSpeakingRef.current = true;
         
-        const playNextChunk = () => {
+        const playNextChunk = async () => {
           if (!isSpeakingRef.current || currentChunkIdx >= chunks.length) {
             setIsSpeaking(false);
             isSpeakingRef.current = false;
@@ -228,11 +236,37 @@ export default function SearchPage() {
           }
           
           const chunkText = chunks[currentChunkIdx];
-          const url = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=${langCode}&q=${encodeURIComponent(chunkText)}`;
           
           if (!cloudAudioRef.current) return;
           const audio = cloudAudioRef.current;
-          audio.src = url;
+
+          try {
+            const response = await fetch("https://api.sarvam.ai/text-to-speech", {
+              method: "POST",
+              headers: {
+                "api-subscription-key": "sk_b2ux1s0k_y2gISHPuLQVikDg7vpnRVbaZ",
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                inputs: [chunkText],
+                target_language_code: speechLang,
+                speaker: "priya",
+                pace: 1.0,
+                speech_sample_rate: 8000,
+                enable_preprocessing: true,
+                model: "bulbul:v3"
+              })
+            });
+
+            if (!response.ok) throw new Error("Sarvam API error");
+            const data = await response.json();
+            audio.src = `data:audio/wav;base64,${data.audios[0]}`;
+          } catch (e) {
+            console.error("Sarvam TTS failed, falling back to Google:", e);
+            const langCode = speechLang.split('-')[0];
+            audio.src = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=${langCode}&q=${encodeURIComponent(chunkText)}`;
+          }
+          
           audio.playbackRate = 0.95;
           
           let animationFrame;
@@ -402,6 +436,17 @@ export default function SearchPage() {
           const vrData = await vrResponse.json();
           if (vrData.items && vrData.items.length > 0) {
             vrYoutubeId = vrData.items[0].id.videoId;
+          }
+        }
+        
+        // Fallback for local places if strict search yields no results
+        if (!vrYoutubeId) {
+          const relaxedRes = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(normalizedSearch + ' 360 tour')}&type=video&maxResults=1&key=AIzaSyAql1uryXvB8TTeBg63O-2JoXes20KE-T8`);
+          if (relaxedRes.ok) {
+            const relaxedData = await relaxedRes.json();
+            if (relaxedData.items && relaxedData.items.length > 0) {
+              vrYoutubeId = relaxedData.items[0].id.videoId;
+            }
           }
         }
       } catch (vrError) {
@@ -662,7 +707,8 @@ export default function SearchPage() {
                       </div>
                     </div>
                   )
-                ) : activeMedia === 'video' && locationData.youtubeId ? (
+                ) : activeMedia === 'video' ? (
+                  locationData.youtubeId ? (
                   <>
                     <iframe 
                       ref={videoIframeRef}
@@ -707,16 +753,12 @@ export default function SearchPage() {
                       </div>
                     </div>
                   </>
-                ) : locationData.videoUrl && !videoFailed ? (
-                  <video 
-                    src={locationData.videoUrl} 
-                    autoPlay 
-                    loop 
-                    muted 
-                    playsInline
-                    onError={() => setVideoFailed(true)}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-                  />
+                  ) : (
+                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', color: 'rgba(255,255,255,0.3)' }}>
+                      <Camera size={48} />
+                      <p>Video Not Available</p>
+                    </div>
+                  )
                 ) : activeMedia === 'image' && locationData.imageUrl ? (
                   <img 
                     src={locationData.imageUrl} 
