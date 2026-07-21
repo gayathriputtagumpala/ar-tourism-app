@@ -96,6 +96,9 @@ export default function SearchPage() {
 
   useEffect(() => {
     if (activeMedia === 'vr') {
+      if (cloudAudioRef.current) {
+        cloudAudioRef.current.pause();
+      }
       window.speechSynthesis.cancel();
       setIsSpeaking(false);
       isSpeakingRef.current = false;
@@ -925,7 +928,7 @@ export default function SearchPage() {
           </div>
         )}
 
-        <audio ref={audioRef} src="https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3" loop style={{ display: 'none' }} />
+        <audio ref={audioRef} src="https://cdn.pixabay.com/audio/2022/11/22/audio_febc508520.mp3" loop style={{ display: 'none' }} />
         <audio ref={cloudAudioRef} referrerPolicy="no-referrer" style={{ display: 'none' }} />
       </div>
 
