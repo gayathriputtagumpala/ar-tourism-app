@@ -936,13 +936,45 @@ export default function SearchPage() {
                     <button 
                       onClick={() => setActiveMedia(null)}
                       style={{
-                        background: 'transparent', border: '1px solid var(--line)', color: 'var(--text)', 
+                        background: 'transparent', border: '1px solid var(--line)', color: '#666', 
                         padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', marginBottom: '20px',
                         display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', fontWeight: '500'
                       }}
                     >
                       ← Change Media
                     </button>
+                    
+                    {/* Audio Controls */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '20px', padding: '10px 15px', background: 'rgba(214, 51, 132, 0.05)', borderRadius: '12px', border: '1px solid rgba(214, 51, 132, 0.2)' }}>
+                      <button 
+                        onClick={() => {
+                          if (cloudAudioRef.current) {
+                            if (isSpeaking) {
+                              cloudAudioRef.current.pause();
+                              setIsSpeaking(false);
+                            } else {
+                              // If it hasn't started yet, or was paused
+                              if (cloudAudioRef.current.src && cloudAudioRef.current.src !== window.location.href) {
+                                cloudAudioRef.current.play().catch(e => console.error("Manual play failed", e));
+                              } else {
+                                // First time play
+                                isSpeakingRef.current = true;
+                                speakSummary(translatedData ? translatedData.summary : locationData.summary);
+                              }
+                              setIsSpeaking(true);
+                            }
+                          }
+                        }}
+                        style={{ background: 'var(--violet)', color: 'white', border: 'none', borderRadius: '50%', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 4px 10px rgba(214, 51, 132, 0.3)' }}
+                      >
+                        {isSpeaking ? <Pause size={20} /> : <Play size={20} style={{ marginLeft: '3px' }} />}
+                      </button>
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <span style={{ fontSize: '14px', fontWeight: '600', color: 'var(--violet)' }}>AI Voice Guide</span>
+                        <span style={{ fontSize: '12px', color: '#666' }}>{isSpeaking ? 'Playing narration...' : 'Click to play narration'}</span>
+                      </div>
+                    </div>
+                    
                     <div ref={textContainerRef} style={{ flex: 1, overflowY: 'auto', paddingRight: '20px' }}>
                       <p style={{ 
                         fontSize: '1.25rem', 
