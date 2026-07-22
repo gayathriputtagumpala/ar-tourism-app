@@ -337,25 +337,47 @@ export default function SearchPage() {
          playNextChunk();
       };
       
-      audio.onerror = () => {
-         cancelAnimationFrame(animationFrame);
-         cumulativeChars += chunkText.length;
-         currentChunkIdx++;
-         playNextChunk();
-      };
-      
-      audio.play().catch(e => {
-        console.error("Audio playback blocked", e);
-        
-        // Final Bulletproof Fallback: Native Browser Speech
+      const fallbackToNative = () => {
         const utterance = new SpeechSynthesisUtterance(chunkText);
         utterance.lang = speechLang;
+        
+        let fallbackFrame;
+        const syncFallback = () => {
+          if (window.speechSynthesis.speaking) {
+             cumulativeChars += 1;
+             setSpokenCharIndex(Math.min(text.length, cumulativeChars));
+             fallbackFrame = requestAnimationFrame(syncFallback);
+          }
+        };
+        
+        utterance.onstart = () => syncFallback();
+        
         utterance.onend = () => {
+          cancelAnimationFrame(fallbackFrame);
           cumulativeChars += chunkText.length;
           currentChunkIdx++;
           playNextChunk();
         };
+        
+        utterance.onerror = () => {
+          cancelAnimationFrame(fallbackFrame);
+          cumulativeChars += chunkText.length;
+          currentChunkIdx++;
+          playNextChunk();
+        };
+        
         window.speechSynthesis.speak(utterance);
+      };
+
+      audio.onerror = () => {
+         cancelAnimationFrame(animationFrame);
+         console.error("Audio src failed to load (CORS/404). Falling back to native.");
+         fallbackToNative();
+      };
+      
+      audio.play().catch(e => {
+        console.error("Audio playback blocked. Falling back to native.", e);
+        fallbackToNative();
       });
     };
     
