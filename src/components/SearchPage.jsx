@@ -953,15 +953,17 @@ export default function SearchPage() {
                               cloudAudioRef.current.pause();
                               setIsSpeaking(false);
                             } else {
-                              // If it hasn't started yet, or was paused
-                              if (cloudAudioRef.current.src && cloudAudioRef.current.src !== window.location.href) {
+                              // Ensure we don't accidentally play the silent unlocker buffer
+                              const isRealAudioReady = cloudAudioRef.current.src && cloudAudioRef.current.src.length > 500 && !cloudAudioRef.current.src.includes('UklGRigAAABXQVZF');
+                              
+                              if (isRealAudioReady && spokenCharIndex > 0) {
                                 cloudAudioRef.current.play().catch(e => console.error("Manual play failed", e));
+                                setIsSpeaking(true);
                               } else {
-                                // First time play
+                                // First time play for this location
                                 isSpeakingRef.current = true;
                                 speakSummary(translatedData ? translatedData.summary : locationData.summary);
                               }
-                              setIsSpeaking(true);
                             }
                           }
                         }}
