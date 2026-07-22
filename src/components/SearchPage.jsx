@@ -963,6 +963,8 @@ export default function SearchPage() {
                               isSpeakingRef.current = true;
                               speakSummary(translatedData ? translatedData.summary : locationData.summary);
                             }
+                            }
+                          }
                         }}
                         style={{ background: 'var(--violet)', color: 'white', border: 'none', borderRadius: '50%', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 4px 10px rgba(214, 51, 132, 0.3)' }}
                       >
