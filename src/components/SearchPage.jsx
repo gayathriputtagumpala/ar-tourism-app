@@ -1017,7 +1017,7 @@ export default function SearchPage() {
                           (translatedData ? translatedData.summary : locationData.summary)
                         ) : (
                           <>
-                            <span style={{ color: '#000', transition: 'color 0.2s', fontWeight: '600' }}>
+                            <span style={{ color: '#000', transition: 'color 0.2s' }}>
                               {(translatedData ? translatedData.summary : locationData.summary).substring(0, spokenCharIndex || 0)}
                             </span>
                             <span>
