@@ -346,10 +346,8 @@ export default function SearchPage() {
       
       audio.play().catch(e => {
         console.error("Audio playback blocked", e);
-        cancelAnimationFrame(animationFrame);
-        cumulativeChars += chunkText.length;
-        currentChunkIdx++;
-        playNextChunk();
+        // Do NOT skip to the next chunk here! Just wait for the user to click the manual Play button!
+        setIsSpeaking(false);
       });
     };
     
@@ -956,7 +954,7 @@ export default function SearchPage() {
                               // Ensure we don't accidentally play the silent unlocker buffer
                               const isRealAudioReady = cloudAudioRef.current.src && !cloudAudioRef.current.src.includes('UklGRigAAABXQVZF');
                               
-                              if (isRealAudioReady && spokenCharIndex > 0) {
+                              if (isRealAudioReady) {
                                 cloudAudioRef.current.play().catch(e => console.error("Manual play failed", e));
                                 setIsSpeaking(true);
                               } else {
