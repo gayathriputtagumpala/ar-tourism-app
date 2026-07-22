@@ -954,7 +954,7 @@ export default function SearchPage() {
                               setIsSpeaking(false);
                             } else {
                               // Ensure we don't accidentally play the silent unlocker buffer
-                              const isRealAudioReady = cloudAudioRef.current.src && cloudAudioRef.current.src.length > 500 && !cloudAudioRef.current.src.includes('UklGRigAAABXQVZF');
+                              const isRealAudioReady = cloudAudioRef.current.src && !cloudAudioRef.current.src.includes('UklGRigAAABXQVZF');
                               
                               if (isRealAudioReady && spokenCharIndex > 0) {
                                 cloudAudioRef.current.play().catch(e => console.error("Manual play failed", e));
