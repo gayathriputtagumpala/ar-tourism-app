@@ -250,6 +250,13 @@ export default function SearchPage() {
       const fetchChunk = async (idx) => {
         if (idx >= chunks.length || audioSources[idx]) return audioSources[idx];
         const chunkText = chunks[idx];
+        
+        // Use native/Google for English to get a standard accent instead of Sarvam's Indian accent
+        if (speechLang.startsWith('en')) {
+           console.log("Bypassing Sarvam for English to use better accent.");
+           throw new Error("Bypass Sarvam for English");
+        }
+        
         try {
           const res = await fetch("https://api.sarvam.ai/text-to-speech", {
             method: "POST",
@@ -260,7 +267,7 @@ export default function SearchPage() {
             body: JSON.stringify({
               inputs: [chunkText],
               target_language_code: speechLang,
-              speaker: "priya",
+              speaker: "meera",
               pace: 1.0,
               speech_sample_rate: 8000,
               enable_preprocessing: true,
