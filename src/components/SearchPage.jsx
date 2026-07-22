@@ -262,13 +262,13 @@ export default function SearchPage() {
           const res = await fetch("https://api.sarvam.ai/text-to-speech", {
             method: "POST",
             headers: {
-              "api-subscription-key": "sk_phz8m2t3_8cPvWoOYNlrz4wznSlM13YHf",
+              "api-subscription-key": "sk_k3ouu0kc_Ikh9SCODMiVbEsLCgNsIzz4Z",
               "Content-Type": "application/json"
             },
             body: JSON.stringify({
               inputs: [chunkText],
               target_language_code: speechLang,
-              speaker: "meera",
+              speaker: "priya",
               pace: 1.0,
               speech_sample_rate: 8000,
               enable_preprocessing: true,
