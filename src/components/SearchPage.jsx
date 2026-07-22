@@ -992,7 +992,7 @@ export default function SearchPage() {
                               setIsSpeaking(false);
                             } else {
                               const isRealAudioReady = cloudAudioRef.current.src && !cloudAudioRef.current.src.includes('UklGRigAAABXQVZF');
-                              if (isRealAudioReady && spokenCharIndex > 0) {
+                              if (isRealAudioReady) {
                                 cloudAudioRef.current.play().catch(e => console.error("Manual play failed", e));
                                 window.speechSynthesis.resume();
                                 setIsSpeaking(true);
