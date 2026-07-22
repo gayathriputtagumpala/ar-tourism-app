@@ -123,24 +123,11 @@ export default function SearchPage() {
         audioRef.current.volume = 0.6;
         audioRef.current.play().catch(e => console.log("Audio play failed:", e));
       }
-    } else if (activeMedia === 'image' || activeMedia === 'video') {
+    } else if (activeMedia === 'image' || activeMedia === 'video' || activeMedia === null) {
       if (audioRef.current) {
         audioRef.current.pause();
       }
-      if (locationData && !isSpeakingRef.current) {
-        speakSummary(translatedData ? translatedData.summary : locationData.summary);
-      }
-    } else {
-      if (audioRef.current) {
-        audioRef.current.pause();
-      }
-      if (cloudAudioRef.current) {
-        cloudAudioRef.current.pause();
-      }
-      window.speechSynthesis.cancel();
-      setIsSpeaking(false);
-      isSpeakingRef.current = false;
-      setSpokenCharIndex(0);
+      // Do NOT cancel speech when activeMedia is null or video or image. Let the user listen.
     }
   }, [activeMedia, locationData, translatedData]);
 
@@ -394,6 +381,12 @@ export default function SearchPage() {
     const queryToUse = directQuery || searchQuery;
     if (!queryToUse.trim()) return;
 
+    // Unlock audio element in current interaction context to prevent browser autoplay blocking
+    if (cloudAudioRef.current) {
+      cloudAudioRef.current.src = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA";
+      cloudAudioRef.current.play().catch(()=>{});
+    }
+
     setIsSearching(true);
     let normalizedSearch = queryToUse.trim().toLowerCase();
     
@@ -441,7 +434,7 @@ export default function SearchPage() {
 
       let youtubeId = null;
       try {
-        const ytResponse = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(normalizedSearch + " cinematic drone 4k landscape high quality")}&type=video&videoDefinition=high&maxResults=1&key=AIzaSyAql1uryXvB8TTeBg63O-2JoXes20KE-T8`);
+        const ytResponse = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(normalizedSearch + " cinematic drone 4k landscape high quality")}&type=video&videoDefinition=high&maxResults=1&key=AIzaSyAHftMMoTGxT3OG6MWUPSfgKMy0Js5xOCg`);
         if (ytResponse.ok) {
           const ytData = await ytResponse.json();
           if (ytData.items && ytData.items.length > 0) {
@@ -459,7 +452,7 @@ export default function SearchPage() {
       // Dynamically fetch VR 360 video from YouTube API!
       let vrYoutubeId = null;
       try {
-        const vrResponse = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(normalizedSearch + ' 360 VR tour immersive')}&type=video&videoDefinition=high&maxResults=1&key=AIzaSyAql1uryXvB8TTeBg63O-2JoXes20KE-T8`);
+        const vrResponse = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(normalizedSearch + ' 360 VR tour immersive')}&type=video&videoDefinition=high&maxResults=1&key=AIzaSyAHftMMoTGxT3OG6MWUPSfgKMy0Js5xOCg`);
         if (vrResponse.ok) {
           const vrData = await vrResponse.json();
           if (vrData.items && vrData.items.length > 0) {
