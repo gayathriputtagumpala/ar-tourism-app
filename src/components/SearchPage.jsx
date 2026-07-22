@@ -346,8 +346,16 @@ export default function SearchPage() {
       
       audio.play().catch(e => {
         console.error("Audio playback blocked", e);
-        // Do NOT skip to the next chunk here! Just wait for the user to click the manual Play button!
-        setIsSpeaking(false);
+        
+        // Final Bulletproof Fallback: Native Browser Speech
+        const utterance = new SpeechSynthesisUtterance(chunkText);
+        utterance.lang = speechLang;
+        utterance.onend = () => {
+          cumulativeChars += chunkText.length;
+          currentChunkIdx++;
+          playNextChunk();
+        };
+        window.speechSynthesis.speak(utterance);
       });
     };
     
@@ -951,19 +959,10 @@ export default function SearchPage() {
                               cloudAudioRef.current.pause();
                               setIsSpeaking(false);
                             } else {
-                              // Ensure we don't accidentally play the silent unlocker buffer
-                              const isRealAudioReady = cloudAudioRef.current.src && !cloudAudioRef.current.src.includes('UklGRigAAABXQVZF');
-                              
-                              if (isRealAudioReady) {
-                                cloudAudioRef.current.play().catch(e => console.error("Manual play failed", e));
-                                setIsSpeaking(true);
-                              } else {
-                                // First time play for this location
-                                isSpeakingRef.current = true;
-                                speakSummary(translatedData ? translatedData.summary : locationData.summary);
-                              }
+                              // Unconditional restart to prevent getting stuck
+                              isSpeakingRef.current = true;
+                              speakSummary(translatedData ? translatedData.summary : locationData.summary);
                             }
-                          }
                         }}
                         style={{ background: 'var(--violet)', color: 'white', border: 'none', borderRadius: '50%', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 4px 10px rgba(214, 51, 132, 0.3)' }}
                       >
