@@ -988,11 +988,18 @@ export default function SearchPage() {
                           if (cloudAudioRef.current) {
                             if (isSpeaking) {
                               cloudAudioRef.current.pause();
+                              window.speechSynthesis.pause();
                               setIsSpeaking(false);
                             } else {
-                              // Unconditional restart to prevent getting stuck
-                              isSpeakingRef.current = true;
-                              speakSummary(translatedData ? translatedData.summary : locationData.summary);
+                              const isRealAudioReady = cloudAudioRef.current.src && !cloudAudioRef.current.src.includes('UklGRigAAABXQVZF');
+                              if (isRealAudioReady && spokenCharIndex > 0) {
+                                cloudAudioRef.current.play().catch(e => console.error("Manual play failed", e));
+                                window.speechSynthesis.resume();
+                                setIsSpeaking(true);
+                              } else {
+                                isSpeakingRef.current = true;
+                                speakSummary(translatedData ? translatedData.summary : locationData.summary);
+                              }
                             }
                           }
                         }}
