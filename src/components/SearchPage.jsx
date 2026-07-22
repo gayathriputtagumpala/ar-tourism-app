@@ -219,18 +219,19 @@ export default function SearchPage() {
     // Use Cloud TTS via audio tag for all languages including English
     const langCode = speechLang.split('-')[0];
     const sentences = text.match(/[^.!?।\n]+[.!?।\n]*/g) || [text];
+    const MAX_CHUNK_LEN = 120; // Shortened for Google TTS Unicode URL limits
     let chunks = [];
     let curr = "";
     sentences.forEach(s => {
       s = s.trim();
       if (!s) return;
-      if (s.length > 480) {
+      if (s.length > MAX_CHUNK_LEN) {
         if (curr) chunks.push(curr);
-        for (let i = 0; i < s.length; i += 480) {
-          chunks.push(s.substring(i, i + 480));
+        for (let i = 0; i < s.length; i += MAX_CHUNK_LEN) {
+          chunks.push(s.substring(i, i + MAX_CHUNK_LEN));
         }
         curr = "";
-      } else if (curr.length + s.length > 480) {
+      } else if (curr.length + s.length > MAX_CHUNK_LEN) {
          chunks.push(curr);
          curr = s + " ";
       } else {
@@ -280,7 +281,8 @@ export default function SearchPage() {
         } catch (e) {
            console.error("Sarvam TTS failed for chunk " + idx + ", falling back to Google:", e);
            const fbLang = speechLang.split('-')[0];
-           const safeText = chunkText.length > 200 ? chunkText.substring(0, 199) : chunkText;
+           // chunk is already <= 120 chars, which is safe for Google TTS even with Unicode
+           const safeText = chunkText;
            audioSources[idx] = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=${fbLang}&q=${encodeURIComponent(safeText)}`;
         }
         return audioSources[idx];
