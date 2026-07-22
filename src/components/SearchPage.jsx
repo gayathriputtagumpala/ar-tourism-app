@@ -99,6 +99,7 @@ export default function SearchPage() {
   const videoIframeRef = useRef(null);
   const audioRef = useRef(null);
   const cloudAudioRef = useRef(null);
+  const audioCacheRef = useRef({}); // Cache TTS audio so manual Play button can instantly resume without network delays
 
   useEffect(() => {
     if (!locationData) {
@@ -249,8 +250,15 @@ export default function SearchPage() {
     (async () => {
       const audioSources = new Array(chunks.length);
       const fetchChunk = async (idx) => {
-        if (idx >= chunks.length || audioSources[idx]) return audioSources[idx];
         const chunkText = chunks[idx];
+        const cacheKey = speechLang + "_" + chunkText;
+        
+        if (audioSources[idx]) return audioSources[idx];
+        if (audioCacheRef.current[cacheKey]) {
+           audioSources[idx] = audioCacheRef.current[cacheKey];
+           return audioSources[idx];
+        }
+
         try {
           const res = await fetch("https://api.sarvam.ai/text-to-speech", {
             method: "POST",
@@ -278,6 +286,7 @@ export default function SearchPage() {
            const safeText = chunkText;
            audioSources[idx] = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=${fbLang}&q=${encodeURIComponent(safeText)}`;
         }
+        audioCacheRef.current[cacheKey] = audioSources[idx];
         return audioSources[idx];
       };
       
@@ -985,7 +994,10 @@ export default function SearchPage() {
                               setIsSpeaking(false);
                             } else {
                               const isRealAudioReady = cloudAudioRef.current.src && !cloudAudioRef.current.src.includes('UklGRigAAABXQVZF');
-                              if (isRealAudioReady) {
+                              const textLen = (translatedData ? translatedData.summary : locationData.summary).length;
+                              const isFinished = spokenCharIndex >= textLen - 10;
+                              
+                              if (isRealAudioReady && !isFinished) {
                                 cloudAudioRef.current.play().catch(e => console.error("Manual play failed", e));
                                 window.speechSynthesis.resume();
                                 setIsSpeaking(true);
