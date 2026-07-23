@@ -103,8 +103,15 @@ export default function SearchPage() {
 
   useEffect(() => {
     if (!locationData) {
-      if (audioRef.current) audioRef.current.pause();
-      if (cloudAudioRef.current) cloudAudioRef.current.pause();
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = "";
+      }
+      if (cloudAudioRef.current) {
+        cloudAudioRef.current.pause();
+        cloudAudioRef.current.src = "";
+      }
+      window.speechSynthesis.pause();
       window.speechSynthesis.cancel();
       setIsSpeaking(false);
       isSpeakingRef.current = false;
@@ -130,6 +137,17 @@ export default function SearchPage() {
       }
       // Do NOT cancel speech when activeMedia is null or video or image. Let the user listen.
     }
+    
+    return () => {
+      // Robust cleanup on unmount or strict dependency change
+      window.speechSynthesis.pause();
+      window.speechSynthesis.cancel();
+      if (cloudAudioRef.current) {
+        cloudAudioRef.current.pause();
+        cloudAudioRef.current.src = "";
+      }
+      isSpeakingRef.current = false;
+    };
   }, [activeMedia, locationData, translatedData]);
 
   const toggleVideoPlay = (e) => {
@@ -257,6 +275,12 @@ export default function SearchPage() {
         if (audioCacheRef.current[cacheKey]) {
            audioSources[idx] = audioCacheRef.current[cacheKey];
            return audioSources[idx];
+        }
+
+        // Bypass Sarvam for Tamil to use Google/Native TTS which has a better local accent
+        if (speechLang.startsWith('ta')) {
+           console.log("Bypassing Sarvam for Tamil to use better local accent.");
+           throw new Error("Bypass Sarvam for Tamil");
         }
 
         try {
